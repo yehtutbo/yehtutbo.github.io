@@ -1,413 +1,164 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="style.css">
-	<link href='https://dl.dropboxusercontent.com/s/mflx62di08y0mz8/fonts.css?family=Conv_Z01-Umoe001' rel='stylesheet'
-		type='text/css' />
-	<script src="script.js"></script>
-	<style>
-		.content {
-			max-width: 400px;
-			margin: 0 auto;
-		}
-	
-		.button {
-			max-width: 400px;
-			margin: 0 auto;
-		}
-	
-		.result {
-			max-width: 400px;
-			margin: 0 auto;
-		}
-	
-		.image-cropper {
-			max-width: 400px;
-			margin: 0 auto;
-		}
-	
-	
-		.image-cropper img {
-			display: block;
-			margin: 0 auto;
-			height: auto;
-			width: 64px;
-			align: center;
-			-webkit-border-radius: 50%;
-			-moz-border-radius: 50%;
-			-ms-border-radius: 50%;
-			-o-border-radius: 50%;
-			border-radius: 50%;
-		}
-	
-		h1,
-		h2,
-		h3 {
-			color: #fcc103;
-			font-weight: bold;
-			font-family: 'Conv_Z01-Umoe001';
-		}
-	
-		p {
-			color: #fcc103;
-		}
-	
-		td {
-			width: 200px;
-			font-family: 'Conv_Z01-Umoe001';
-		}
-	
-		tr {
-			height: 50px;
-			font-size: 22px;
-		}
-	
-		input {
-			width: 150px;
-			height: auto;
-			display: block;
-			text-align: center;
-			color: white;
-			background-color: #575D65;
-			font-size: 20px;
-			font-family: 'Conv_Z01-Umoe001';
-		}
-	
-		span {
-			font-family: 'Conv_Z01-Umoe001';
-			font-size: 22px;
-		}
-	
-		a {
-			color: #fcc103;
-		}
-	
-		body {
-			background-color: black;
-			font-size: 100%;
-			color: silver;
-		}
-	
-		button {
-			width: 160px;
-			height: 50px;
-			font-size: 20px;
-			border-radius: 12px;
-			color: black;
-			background-color: #fcc103;
-			font-family: 'Conv_Z01-Umoe001';
-		}
-	</style>
-	<script>
-		function calculate(){
-	        var GP = document.getElementById("GoldPrice").value;
-	        var GWK = document.getElementById("GoldWeightKyat").value;
-	        var GWP = document.getElementById("GoldWeightPae").value;
-	        var GWY = document.getElementById("GoldWeightYway").value;
-			var RP 	= document.getElementById("ReductionPae").value;
-			var RY	= document.getElementById("ReductionYway").value;
-			var newLine	= "\r\n"
-	        var shwe = (((GWY/8/16)+(GWP/16)+(GWK*1))*(GP));
-		    var ayotwet = (((RY/8/16)+(RP/16))*(GP));
-	    	var GS = document.getElementById("Smith").value;
-	    	var latkha = GS*1;
-	    	var total	= shwe + ayotwet + latkha;
-			var shwezay = GP*1;
-	
-			if(document.getElementById("GoldPrice").value.length == 0) {
-	        shwezay = "";}
-	        if(document.getElementById("GoldWeightKyat").value.length == 0) {
-	        gwkText = "";} else {gwkText = " ကျပ်"; }
-			
-	        if(document.getElementById("GoldWeightPae").value.length == 0) {
-	        gwpText = "";} else {gwpText = " ပဲ"; }
-			if(document.getElementById("GoldWeightYway").value.length == 0) {
-	        gwyText = "";} else {gwyText = " ရွေး"; }
-	
-					
-	
-		  	if( 
-	        document.getElementById("GoldWeightKyat").value.length == 0 &&
-			document.getElementById("GoldWeightPae").value.length == 0 &&
-			document.getElementById("GoldWeightYway").value.length == 0
-	        )
-	        { 	gwpText = "မထည့်သွင်းရသေးပါ";}
-	
-	
-			    if(document.getElementById("ReductionPae").value.length == 0) {
-			    rpText = "";} else {rpText = " ပဲ"; }
-			    if(document.getElementById("ReductionYway").value.length == 0) {
-			    ryText = "";} else {ryText = " ရွေး"; }
-	
-	
-	        if (
-			document.getElementById("ReductionPae").value.length == 0 &&
-			document.getElementById("ReductionYway").value.length == 0
-	        )
-	        {rpText = "မထည့်သွင်းရသေးပါ";}
-	
-					/*
-	
-					if(document.getElementById("GoldWeightPae").value == 4) {
-					GWP=""; gwpText = "တစ်မတ်";}
-					else {
-					if(document.getElementById("GoldWeightPae").value == 8) {
-						GWP=""; gwpText = "ငါးမူး";}
-					else {
-					if(document.getElementById("GoldWeightPae").value == 12) {
-					GWP=""; gwpText = "သုံးမတ်";}
-					
-						}
-					}
-	
-					if(document.getElementById("ReductionPae").value == 4) {
-					RP=""; gwpText = "တစ်မတ်";}
-					else {
-					if(document.getElementById("ReductionPae").value == 8) {
-					RP=""; rpText = "ငါးမူး";}
-					else {
-					if(document.getElementById("ReductionPae").value == 12) {
-					RP=""; rpText = "သုံးမတ်";}
-					
-					  }
-					}
-	        */
-	
-	
-			if(document.getElementById("Smith").value.length == 0) {
-			gsText = "မထည့်သွင်းရသေးပါ";} 
-	        else {gsText = " ကျပ်"; }
-	
-	        if(document.getElementById("GoldPrice").value.length == 0) {
-	        mpText = "မထည့်သွင်းရသေးပါ";}
-	        else {mpText = " ကျပ်"; }
-					
-	       
-	        /* alert("ရွှေတန်ဖိုးသီးသန့် = " + shwe + newLine + "အလျော့တွက် = " + ayotwet + newLine + "လက်ခ = " + latkha + newLine + "စုစုပေါင်း = " + total); */
-	    	document.getElementById("GoldValue").innerHTML = shwe.toLocaleString()+" ကျပ်";
-	    	document.getElementById("AYotTwetValue").innerHTML = ayotwet.toLocaleString()+" ကျပ်";
-	    	document.getElementById("Total").innerHTML = total.toLocaleString()+" ကျပ်";
-	        document.getElementById("GoldValueText").innerHTML = "ရွှေတန်ဖိုးသီးသန့်";
-	        document.getElementById("AYotTwetValueText").innerHTML = "အလျော့တွက်သီးသန့်";
-	        document.getElementById("TotalText").innerHTML = "စုစုပေါင်းကျသင့်ငွေ";
-	        
-					
-	        
-	        document.getElementById("GoldWeightTotalText").innerHTML = "ရွှေအလေးချိန်";
-	        document.getElementById("GoldWeightTotal").innerHTML = GWK+gwkText+" "+GWP+gwpText+" "+GWY+gwyText;
-			document.getElementById("ReductionTotalText").innerHTML = "အလျော့တွက်";
-			document.getElementById("ReductionTotal").innerHTML = RP+rpText+" "+RY+ryText;
-	
-			document.getElementById("SmithText").innerHTML = "လက်ခ";
-			document.getElementById("SmithValue").innerHTML = GS+gsText;
-	
-			document.getElementById("MarketPriceText").innerHTML = "ရွေဈေး";
-			document.getElementById("MarketPrice").innerHTML = shwezay.toLocaleString()+mpText;
-	        
-	
-			var x = document.getElementById("input");
-			if (x.style.display === "none") {
-			x.style.display = "block";		
-			} else {
-			x.style.display = "none";
-			}
-			
-			var y = document.getElementById("result");
-			if (x.style.display === "none") {
-			y.style.display = "block";
-			} else {
-			y.style.display = "none";
-			}
-			
-			var z = document.getElementById("avatar");
-			if (y.style.display === "block") {
-			z.style.display = "block";
-			} else {
-			z.style.display = "none";
-			}
-			
-			
-	
-			
-	
-			smoothScroll(document.getElementById('result'))
-	
-	      }	  
-	
-			function clearText()
-			{
-			document.getElementById('GoldPrice').value = "";
-			document.getElementById('GoldWeightKyat').value = "";
-			document.getElementById('GoldWeightPae').value = "";
-			document.getElementById('GoldWeightYway').value = "";
-			document.getElementById('ReductionPae').value = "";
-			document.getElementById('ReductionYway').value = "";
-			document.getElementById('Smith').value = "";
-	
-			smoothScroll(document.getElementById('input'))
-	
-			var x = document.getElementById("input");
-			if (x.style.display === "none") {
-			x.style.display = "block";
-			} else {
-			x.style.display = "none";
-			}
-			
-			var y = document.getElementById("result");
-			if (x.style.display === "none") {
-			y.style.display = "block";
-			} else {
-			y.style.display = "none";
-			}
-			
-			var z = document.getElementById("avatar");
-			if (y.style.display === "block") {
-			z.style.display = "block";
-			} else {
-			z.style.display = "none";
-			}
-			
-		
-		
-		}
-	
-		window.smoothScroll = function(target) {
-			var scrollContainer = target;
-			do { //find scroll container
-				scrollContainer = scrollContainer.parentNode;
-				if (!scrollContainer) return;
-				scrollContainer.scrollTop += 1;
-			} while (scrollContainer.scrollTop == 0);
-			
-			var targetY = 0;
-			do { //find the top of target relatively to the container
-				if (target == scrollContainer) break;
-				targetY += target.offsetTop;
-			} while (target = target.offsetParent);
-			
-			scroll = function(c, a, b, i) {
-				i++; if (i > 30) return;
-				c.scrollTop = a + (b - a) / 30 * i;
-				setTimeout(function(){ scroll(c, a, b, i); }, 20);
-			}
-	    // start scrolling
-	    scroll(scrollContainer, scrollContainer.scrollTop, targetY, 0);
-	}
-	</script>
-	
-	</head>
-	
-	<body>
-		<div class="content" id="input">
-			<!--  <h1 align="center">MM Gold Calculator</h1> -->
-	
-			<h1>ရွှေဈေးနှုန်း</h1>
-			<table>
-				<tr>
-					<td>ယနေ့ရွှေဈေး</td>
-					<td><input type='number' id='GoldPrice'/></td>
-				</tr>
-			</table>
-			<h1>ရွှေအလေးချိန်</h1>
-			<table>
-				<tr>
-					<td>ကျပ်</td>
-					<td><input type='number' id='GoldWeightKyat'/></td>
-				</tr>
-				<tr>
-					<td>ပဲ</td>
-					<td><input type='number' id='GoldWeightPae'/></td>
-				</tr>
-				<tr>
-					<td>ရွေး</td>
-					<td><input type='number' id='GoldWeightYway'/></td>
-				</tr>
-			</table>
-	
-			<h1>အလျော့တွက်</h1>
-			<table>
-				<tr>
-					<td>ပဲ</td>
-					<td><input type='number' id='ReductionPae'/></td>
-				</tr>
-				<tr>
-					<td>ရွေး</td>
-					<td><input type='number' id='ReductionYway'/></td>
-				</tr>
-			</table>
-	
-			<h1>လက်ခ</h1>
-			<table>
-				<tr>
-					<td>လက်ခ</td>
-					<td><input type='number' id='Smith'/></td>
-				</tr>
-			</table>
-			<br>
-			<table>
-				<tr>
-					<td></td>
-					<td><button onClick='calculate()' >Calculate</button></td>
-				</tr>
-			</table>
-		</div>
-	
-	
-		<div class="result" id="result" style="display:none">
-			<h1>တွက်ချက်မှုရလဒ်</h1>
-			<hr class="dotted"><br>
-			<table>
-				<tr>
-					<td><span id='MarketPriceText'/></td>
-					<td><span id='MarketPrice'/></td>
-			</tr>
-			<tr>
-					<td><span id='GoldWeightTotalText'/></td>
-				<td><span id='GoldWeightTotal'/></td>
-			</tr>
-			<tr>
-				<td><span id='GoldValueText'/></td>
-				<td><span id='GoldValue'/></td>
-			</tr>
-			<tr>
-				<td><span id='ReductionTotalText'/></td>
-				<td><span id='ReductionTotal'/></td>
-					</tr>
-			<tr>
-				<td><span id='AYotTwetValueText'/></td>
-				<td><span id='AYotTwetValue'/></td>
-			</tr>
-			<tr>
-				<td><span id='SmithText'/></td>
-				<td><span id='SmithValue'/></td>
-			</tr>
-			<tr>
-				<td><span id='TotalText'/></td>
-				<td><span id='Total'/></td>
-			</tr>
-		</table>
-		<br>
-		<hr class="dotted">
-		<br>
-		<table>
-			<tr>
-				<td><button onClick = "calculate()">Back</button></td>
-				<td><button onClick = "clearText()">New</button></td>
-			</tr>
-		</table>
-	
-		</div>
-		<br>
-		  
-	
-			
-				<div class="image-cropper" id="avatar" style="display:none">
-				<p align="center"><a href="fb://profile/100001608641997"><i>Coded by Ye Htut Bo</i></a> </p>
-					<img src="https://dl.dropboxusercontent.com/s/vacgdtfv3c5r049/avatar1942649568-0.jpg" class="rounded" />
-				</div>
-				
-	  </body>
-	
-	</html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ye Htut Bo - Resume</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section p {
+            margin: 0;
+			text-align: justify;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .section ul li {
+            margin-bottom: 10px;
+        }
+
+        .skills li {
+            background-color: #3498db;
+            color: #fff;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .contact a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://media.licdn.com/dms/image/v2/D5603AQFIs436Y2iyiA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1677484029636?e=1730937600&v=beta&t=agtK-PE_K29j6upHY9jaydcPl2cOb864k07_LJ1RBBM" alt="Profile Photo">
+            <h1>Ye Htut Bo</h1>
+            <p>Broadcast & IT Engineer | Hobby Coder  | Creative Thinker</p>
+        </div>
+
+        <div class="section profile">
+            <h2>Profile</h2>
+            <p>As the Head of Engineering in the Broadcast & IT field, I bring extensive experience in leading engineering teams and implementing innovative solutions that drive operational excellence. My expertise spans across broadcast technology, IT infrastructure, and software development. I have a strong passion for coding and problem-solving, with hands-on experience in HTML, JavaScript, and Google Apps Script.</p>
+        </div>
+
+        <div class="section experience">
+            <h2>Experience</h2>
+            <ul>
+                <li>
+                    <h3>Head of Broadcast Engineering at Padamyar FM Media Co., Ltd</h3>
+                    <p><strong>2021 - Present</strong></p>
+                    <p>Developed and maintained web applications using HTML, CSS, JavaScript, and React. Collaborated with the design team to create responsive and visually appealing interfaces.</p>
+                </li>
+                <li>
+                    <h3>Head of Maintenance Section at Padamyar FM Media Co., Ltd<</h3>
+                    <p><strong>2020 - 2021</strong></p>
+                    <p>Assisted in the development of e-commerce websites, implemented SEO best practices, and optimized site performance.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section education">
+            <h2>Education</h2>
+            <ul>
+                <li>
+                    <h3>Bachelor of Science in Industrial Chemistry</h3>
+                    <p><strong>University of East Yangon, 2004 - 2008</strong></p>
+                    <p>Graduated with honors, specialized in software development and web technologies.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section skills">
+            <h2>Skills</h2>
+            <ul>
+                <li>Broadcast Engineering</li>
+                <li>RF Engineering</li>
+                <li>IT Infrastructure</li>
+                <li>Video/Audio Compression</li>
+                <li>Media Asset Management (MAM)</li>
+                <li>Automation Systems</li>
+                <li>Signal Flow & Routing</li>
+                <li>Digital & IP Broadcasting</li>
+				<li>Project Management</li>
+				<li>Team Leadership</li>
+				<li>Strategic Planning</li>
+				<li>Budget Management</li>
+				<li>Vendor Management</li>
+				<li>Crisis Management</li>
+				<li>Broadcast Software</li>
+				<li>Scripting & Programming</li>
+				<li>HTML, JavaScript, Google Apps Script</li>
+				<li>Database Management</li>
+				<li>Communication</li>
+				<li>Problem-Solving</li>
+				<li>Collaboration</li>
+				<li>Adaptability</li>
+            </ul>
+        </div>
+
+        <div class="section contact">
+            <h2>Contact</h2>
+            <p>Email: <a href="mailto:yehtutbo@outlook.com">yehtutbo@outlook.com</a></p>
+            <p>Phone: +959 4309 1659</p>
+            <p>LinkedIn: <a href="https://linkedin.com/in/yehtutbo" target="_blank">linkedin.com/in/yehtutbo</a></p>
+        </div>
+    </div>
+</body>
+</html>
