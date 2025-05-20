@@ -1,194 +1,155 @@
-<html>
-  
-</html><div class="main-container" id="app">
-        
-    <section style="padding: 30px 0">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-12 text-center">
-                    <h4 class="uppercase mb60"></h4>
-                </div>
-            </div>
-            <!--end of row-->
-            <div class="row">
-                <div class="col-md-offset-3 col-md-6 col-sm-offset-3 col-sm-6">
-                    <div id="calculate" class="pricing-table pt-2 meter-boxed"><h4 class="text-center">နှုန်းသစ်အတွက် Calculator</h4> <!----> <div class="row"><div class="col-md-12"><div class="form-group"><label class="mb-15">မီတာအမျိုးအစားရွေးချယ်ရန်</label> <div><label><input name="type" type="radio" checked="checked" class="cheker" value="home">
-                                            အိမ်သုံးအမျိုးအစား
-                                        </label> <label><input name="type" type="radio" class="cheker" value="work">
-                                            အိမ်သုံးမဟုတ်သည့်အမျိုးအစား
-                                        </label></div></div></div> <div class="col-md-12"><div class="form-group"><label>မီတာယူနစ်</label> <input id="unit" type="number" placeholder="500" min="0" required="required" class="form-control text-right" style="appearance: textfield;"></div></div></div> <button type="button" class="btn btn-filled pull-right">Calculate
-                        </button> <div class="clearfix"></div> <hr> <div><div class="hidden-xs"><table class="table table-bordered"><tbody><tr><th>ယူနစ်အလွှာ</th> <th>နှုန်းထား</th> <th>ယူနစ်</th> <th>ကျပ်</th></tr> <tr><td>1-50 ယူနစ်</td> <td>50 ကျပ်</td> <td style="text-align: right;"><div>50</div></td> <td style="text-align: right;">2,500</td></tr> <tr><td>51-100 ယူနစ်</td> <td>100 ကျပ်</td> <td style="text-align: right;"><div>50</div></td> <td style="text-align: right;">5,000</td></tr> <tr><td>101-200 ယူနစ်</td> <td>150 ကျပ်</td> <td style="text-align: right;"><div>100</div></td> <td style="text-align: right;">15,000</td></tr> <tr><td>201 ယူနစ်အထက်</td> <td>300 ကျပ်</td> <td style="text-align: right;"><div>300</div></td> <td style="text-align: right;">90,000</td></tr> <tr><td colspan="2">စုစုပေါင်း</td> <td style="text-align: right;">500</td> <td style="text-align: right;">112,500
-                                        </td></tr></tbody></table></div> <div class="visible-xs"><div class="col-md-12"><div class="panel-group"><div class="panel panel-default"><div class="panel-heading" style="color: rgb(255, 255, 255); background-color: rgb(114, 137, 248);">
-                                                1-50 ယူနစ်
-                                            </div> <div class="panel-body"><ul><li>နှုန်းထား : 50 ကျပ်</li> <li>ယူနစ် : <span>50</span></li> <li>ကျပ် : 2,500</li></ul></div></div> <div class="panel panel-default"><div class="panel-heading" style="color: rgb(255, 255, 255); background-color: rgb(114, 137, 248);">
-                                                51-100 ယူနစ်
-                                            </div> <div class="panel-body"><ul><li>နှုန်းထား : 100 ကျပ်</li> <li>ယူနစ် : <span>50</span></li> <li>ကျပ် : 5,000</li></ul></div></div> <div class="panel panel-default"><div class="panel-heading" style="color: rgb(255, 255, 255); background-color: rgb(114, 137, 248);">
-                                                101-200 ယူနစ်
-                                            </div> <div class="panel-body"><ul><li>နှုန်းထား : 150 ကျပ်</li> <li>ယူနစ် : <span>150</span></li> <li>ကျပ် : 15,000</li></ul></div></div> <div class="panel panel-default"><div class="panel-heading" style="color: rgb(255, 255, 255); background-color: rgb(114, 137, 248);">
-                                                201 ယူနစ်အထက်
-                                            </div> <div class="panel-body"><ul><li>နှုန်းထား : 300 ကျပ်</li> <li>ယူနစ် : <span>300</span></li> <li>ကျပ် : 90,000</li></ul></div></div> <div class="panel panel-default"><div class="panel-heading" style="color: rgb(255, 255, 255); background-color: rgb(114, 137, 248);">
-                                                စုစုပေါင်း
-                                            </div> <div class="panel-body"><ul><li>ကျပ် : 112,500
-                                                    </li></ul></div></div></div></div></div></div> <div><!----> <!----></div></div>
-                    <!--end of pricing table-->
-                </div>
-            </div>
-            <!--end of row-->
-        </div>
-        <!--end of container-->
-    </section>
-
-            </div>
-  <script type="text/javascript">
-    let baseURL = "https://www.yesc.com.mm";
-</script>
-<script src="https://www.yesc.com.mm/yesc_theme/js/jquery.min.js"></script>
-<script src="https://www.yesc.com.mm/yesc_theme/js/bootstrap.min.js"></script>
-
-
-<script src="https://www.yesc.com.mm/yesc_theme/js/flexslider.min.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-<script type="text/javascript" src="https://www.yesc.com.mm/plugins/toast/toast.min.js"> </script>
-<script type="text/javascript" src="https://www.yesc.com.mm/yesc_theme/js/site.js"></script>
-
-<script>
-    $(window).scroll(function() {
-        var scroll = $(window).scrollTop();
-
-        if (scroll >= 500) {
-            $("#header").addClass("scrolled");
-        } else {
-            $("#header").removeClass("scrolled");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meter Unit Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
         }
-    });
-    $( ".reply" ).click(function( event ) {
-        event.preventDefault();
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-        });
-        var mainUrl="https://www.yesc.com.mm/meter/noti";
-        var location = $(this).attr("data-location");
-        $.ajax({
-            type: "POST",
-            url : mainUrl,
-            data: { 'id' : location },
-            success: function(data){
-                $('#reply_class_remove'+data.id).removeClass('reply_bg');
-                $('#reply_class_add'+data.id).addClass('btn-modal');
-                $('#myModal'+data.id).addClass('reveal-modal');
-                $('#modalBackground'+data.id).addClass('reveal-modal');
-            },
-            error: function(data){
-                var errors = data.responseJSON;
-            }
-        });
-    });
-    $(document).ready(function() {
-        $("#languageSwitcher").change(function() {
-            var locale = $(this).val();
-            var _token = '5dVv1xqkVWDbTxezhXtZA3cog0Vd7Y9HFubjTDGR';
-
-            $.ajax({
-                url: "/language",
-                type: "POST",
-                data: {
-                    locale: locale,
-                    _token: _token
-                },
-                complete: function(data) {
-                    window.location.reload();
-                }
-            });
-        });
-    });
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-131802414-1', 'auto');
-      ga('send', 'pageview');
-</script>
-        <style>
-        /* Hide spinner buttons for number inputs */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
-        input[type="number"] {
-            -moz-appearance: textfield; /* Firefox */
-            appearance: textfield; /* Cross-browser support */
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .input-group input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .button-group button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
         }
     </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Meter Unit Calculator</h1>
+
+        <div class="input-group">
+            <label for="homeUnits">Home Use Units:</label>
+            <input type="number" id="homeUnits" placeholder="Enter units for home use" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="industrialUnits">Industrial Use Units:</label>
+            <input type="number" id="industrialUnits" placeholder="Enter units for industrial use" min="0">
+        </div>
+
+        <div class="button-group">
+            <button onclick="calculateCost()">Calculate Total Cost</button>
+        </div>
+
+        <div class="result" id="totalCost">
+            Total Cost: 0 MMK
+        </div>
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const input = document.querySelector('input[type="number"]');
-            if (input) {
-                input.addEventListener('wheel', function (event) {
-                    event.preventDefault(); // Prevent mouse scroll from changing value
-                });
+        function calculateCost() {
+            const homeUnitsInput = document.getElementById('homeUnits');
+            const industrialUnitsInput = document.getElementById('industrialUnits');
+            const totalCostDisplay = document.getElementById('totalCost');
+            const errorMessageDisplay = document.getElementById('errorMessage');
+
+            let homeUnits = parseInt(homeUnitsInput.value);
+            let industrialUnits = parseInt(industrialUnitsInput.value);
+
+            // Reset previous results and error messages
+            totalCostDisplay.textContent = 'Total Cost: 0 MMK';
+            errorMessageDisplay.textContent = '';
+
+            if (isNaN(homeUnits) && isNaN(industrialUnits)) {
+                errorMessageDisplay.textContent = 'Please enter units for either Home Use or Industrial Use.';
+                return;
             }
-        });
-    </script>
-    <script type="text/javascript" src="https://www.yesc.com.mm/plugins/axios/axios.min.js"></script>
-    <script src="https://www.yesc.com.mm/plugins/vue/dist/vue_2.js"></script>
-    <script type="text/javascript">
-        var app = new Vue({
-            el: '#calculate',
-            filters: {
-                currency(amount) {
-                    const amt = Number(amount);
-                    return amt && amt.toLocaleString(undefined, {maximumFractionDigits: 2}) || '0';
-                },
-            },
-            data: {
-                type: 'home',
-                unit: '',
-                calculate: [],
-                errors: ''
-            },
-            methods: {
-                validateUnit: function () {
-                    // Ensure unit is a positive number
-                    if (this.unit < 0 || isNaN(this.unit)) {
-                        this.unit = '';
-                    }
-                },
-                getCalculate: function () {
-                    this.calculate = [];
-                    if (this.type && this.unit && this.unit > 0) {
-                        axios.post('../get-calculate/' + this.type + '/' + this.unit)
-                            .then(response => {
-                                this.calculate = response.data; // Update the data
-                                $("div").removeClass("hidden");
-                            })
-                            .catch(error => {
-                                this.errors = "Too many requests Please Wait 1 minute";
-                            });
-                    } else {
-                        this.errors = "Unit must be a positive number.";
-                    }
+
+            if (homeUnits < 0 || industrialUnits < 0) {
+                errorMessageDisplay.textContent = 'Units cannot be negative.';
+                return;
+            }
+
+            let totalCost = 0;
+
+            // Calculate Home Use Cost
+            if (!isNaN(homeUnits) && homeUnits >= 0) {
+                if (homeUnits <= 50) {
+                    totalCost += homeUnits * 50;
+                } else if (homeUnits <= 100) {
+                    totalCost += (50 * 50) + ((homeUnits - 50) * 100);
+                } else if (homeUnits <= 200) {
+                    totalCost += (50 * 50) + (50 * 100) + ((homeUnits - 100) * 150);
+                } else {
+                    totalCost += (50 * 50) + (50 * 100) + (100 * 150) + ((homeUnits - 200) * 300);
                 }
             }
-        });
-        $(document).ready(function () {
-            $("button").click(function () {
-                $("div").removeClass("hidden");
-            });
-        });
+
+            // Calculate Industrial Use Cost
+            if (!isNaN(industrialUnits) && industrialUnits >= 0) {
+                if (industrialUnits <= 5000) {
+                    totalCost += industrialUnits * 250;
+                } else if (industrialUnits <= 20000) {
+                    totalCost += (5000 * 250) + ((industrialUnits - 5000) * 400);
+                } else {
+                    totalCost += (5000 * 250) + (15000 * 400) + ((industrialUnits - 20000) * 500);
+                }
+            }
+
+            totalCostDisplay.textContent = `Total Cost: ${totalCost.toLocaleString()} MMK`;
+        }
     </script>
+</body>
 </html>
