@@ -10,6 +10,7 @@
             margin: 20px;
             background-color: #f4f4f4;
             color: #333;
+            line-height: 1.6;
         }
         .container {
             max-width: 600px;
@@ -77,6 +78,30 @@
             margin-top: 10px;
             text-align: center;
         }
+        .rate-details {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .rate-details h2 {
+            text-align: left;
+            margin-bottom: 15px;
+            color: #0056b3;
+        }
+        .rate-details ul {
+            list-style: none;
+            padding: 0;
+        }
+        .rate-details ul li {
+            background-color: #f9f9f9;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .rate-details ul li strong {
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +130,25 @@
             Total Cost: 0 MMK
         </div>
         <div class="error-message" id="errorMessage"></div>
+
+        <div class="rate-details">
+            <h2>Rate Details</h2>
+
+            <h3>Home Use Rates:</h3>
+            <ul>
+                <li><strong>1 to 50 units:</strong> 50 MMK per unit</li>
+                <li><strong>51 to 100 units:</strong> 100 MMK per unit</li>
+                <li><strong>101 to 200 units:</strong> 150 MMK per unit</li>
+                <li><strong>Above 201 units:</strong> 300 MMK per unit</li>
+            </ul>
+
+            <h3>Industrial Use Rates:</h3>
+            <ul>
+                <li><strong>1 to 5000 units:</strong> 250 MMK per unit</li>
+                <li><strong>5001 to 20000 units:</strong> 400 MMK per unit</li>
+                <li><strong>Above 20001 units:</strong> 500 MMK per unit</li>
+            </ul>
+        </div>
     </div>
 
     <script>
