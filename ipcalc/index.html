@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subnet Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-purple-100 flex justify-center items-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-2xl transition-transform hover:scale-105">
+        <h1 class="text-2xl font-semibold text-blue-600 text-center mb-6">Subnet Calculator</h1>
+        <div class="mb-4">
+            <label for="ipAddress" class="block text-gray-700 text-sm font-bold mb-2">IP Address:</label>
+            <input type="text" id="ipAddress" placeholder="e.g., 192.168.1.0" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="subnetMask" class="block text-gray-700 text-sm font-bold mb-2">Subnet Mask / CIDR:</label>
+            <input type="text" id="subnetMask" placeholder="e.g., 255.255.255.0 or 24" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="flex space-x-4 mb-4">
+            <button id="calculateBtn" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">Calculate</button>
+            <button id="resetBtn" class="bg-gradient-to-r from-red-400 to-yellow-500 hover:from-red-500 hover:to-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">Reset</button>
+        </div>
+
+        <div id="results" class="mt-6 p-4 bg-gray-50 rounded-md shadow-inner">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Results:</h2>
+            <div id="resultsContent" class="space-y-2">
+                <p><span class="font-semibold text-gray-700">Network Address:</span> <span id="networkAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Broadcast Address:</span> <span id="broadcastAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">IP Class:</span> <span id="ipClass" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Number of Hosts:</span> <span id="numHosts" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Usable Host Range:</span> <span id="hostRange" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Subnet Mask (Decimal):</span> <span id="subnetMaskDecimal" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Subnet Mask (CIDR):</span> <span id="subnetMaskCIDR" class="text-blue-600"></span></p>
+            </div>
+        </div>
+        <div id="error-message" class="mt-4 text-red-500 font-semibold border border-red-500/50 rounded-md p-3 bg-red-50/50 hidden"></div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', calculateSubnet);
+        document.getElementById('resetBtn').addEventListener('click', resetFields);
+
+        function calculateSubnet() {
+            const ipAddress = document.getElementById('ipAddress').value;
+            const subnetMaskInput = document.getElementById('subnetMask').value;
+            const resultsDiv = document.getElementById('resultsContent');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            let ipParts, subnetMaskParts, cidr;
+
+            // Clear previous results and error message
+            resultsDiv.innerHTML = `
+                <p><span class="font-semibold text-gray-700">Network Address:</span> <span id="networkAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Broadcast Address:</span> <span id="broadcastAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">IP Class:</span> <span id="ipClass" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Number of Hosts:</span> <span id="numHosts" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Usable Host Range:</span> <span id="hostRange" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Subnet Mask (Decimal):</span> <span id="subnetMaskDecimal" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Subnet Mask (CIDR):</span> <span id="subnetMaskCIDR" class="text-blue-600"></span></p>
+            `;
+            errorMessageDiv.classList.add('hidden');
+            errorMessageDiv.textContent = '';
+
+            // Validate IP Address
+            ipParts = ipAddress.split('.');
+            if (ipParts.length !== 4 || ipParts.some(part => isNaN(parseInt(part)) || parseInt(part) < 0 || parseInt(part) > 255)) {
+                displayErrorMessage('Invalid IP Address format. Please use xxx.xxx.xxx.xxx format.');
+                return;
+            }
+
+            // Validate Subnet Mask or CIDR
+            if (subnetMaskInput.includes('.')) {
+                subnetMaskParts = subnetMaskInput.split('.');
+                if (subnetMaskParts.length !== 4 || subnetMaskParts.some(part => isNaN(parseInt(part)) || parseInt(part) < 0 || parseInt(part) > 255)) {
+                    displayErrorMessage('Invalid Subnet Mask format. Please use xxx.xxx.xxx.xxx format.');
+                    return;
+                }
+                cidr = calculateCIDR(subnetMaskParts.map(Number));
+                if (cidr === null) {
+                    displayErrorMessage('Invalid Subnet Mask value.');
+                    return;
+                }
+            } else {
+                cidr = parseInt(subnetMaskInput);
+                if (isNaN(cidr) || cidr < 0 || cidr > 32) {
+                    displayErrorMessage('Invalid CIDR value. Please use a number between 0 and 32.');
+                    return;
+                }
+                subnetMaskParts = calculateSubnetMask(cidr);
+            }
+
+            const ipDecimal = ipParts.map(Number);
+            const subnetMaskDecimal = subnetMaskParts.map(Number);
+
+            const networkAddressDecimal = calculateNetworkAddress(ipDecimal, subnetMaskDecimal);
+            const broadcastAddressDecimal = calculateBroadcastAddress(networkAddressDecimal, subnetMaskDecimal);
+            const ipClass = getIPClass(ipDecimal[0]);
+            const numHosts = calculateNumHosts(cidr);
+            const hostRange = getHostRange(networkAddressDecimal, broadcastAddressDecimal);
+
+            displayResults(networkAddressDecimal, broadcastAddressDecimal, ipClass, numHosts, hostRange, subnetMaskDecimal, cidr);
+
+            function displayResults(networkAddress, broadcastAddress, ipClass, numHosts, hostRange, subnetMaskDecimal, cidr) {
+                document.getElementById('networkAddress').textContent = networkAddress.join('.');
+                document.getElementById('broadcastAddress').textContent = broadcastAddress.join('.');
+                document.getElementById('ipClass').textContent = ipClass;
+                document.getElementById('numHosts').textContent = numHosts;
+                document.getElementById('hostRange').textContent = hostRange;
+                document.getElementById('subnetMaskDecimal').textContent = subnetMaskDecimal.join('.');
+                document.getElementById('subnetMaskCIDR').textContent = '/' + cidr;
+            }
+
+            function displayErrorMessage(message) {
+                const errorMessageDiv = document.getElementById('error-message');
+                errorMessageDiv.textContent = message;
+                errorMessageDiv.classList.remove('hidden');
+            }
+
+            function calculateNetworkAddress(ip, subnetMask) {
+                const networkAddress = [];
+                for (let i = 0; i < 4; i++) {
+                    networkAddress[i] = ip[i] & subnetMask[i];
+                }
+                return networkAddress;
+            }
+
+            function calculateBroadcastAddress(networkAddress, subnetMask) {
+                const broadcastAddress = [];
+                for (let i = 0; i < 4; i++) {
+                    broadcastAddress[i] = networkAddress[i] | (~subnetMask[i] & 255);
+                }
+                return broadcastAddress;
+            }
+
+            function getIPClass(firstOctet) {
+                if (firstOctet >= 0 && firstOctet <= 127) return 'A';
+                else if (firstOctet >= 128 && firstOctet <= 191) return 'B';
+                else if (firstOctet >= 192 && firstOctet <= 223) return 'C';
+                else if (firstOctet >= 224 && firstOctet <= 239) return 'D';
+                else if (firstOctet >= 240 && firstOctet <= 255) return 'E';
+                else return 'Invalid';
+            }
+
+            function calculateNumHosts(cidr) {
+                return cidr === 32 ? 1 : Math.pow(2, 32 - cidr) - 2;
+            }
+
+            function getHostRange(networkAddress, broadcastAddress) {
+                if (networkAddress.join('.') === broadcastAddress.join('.')) {
+                    return "N/A"; //  When there is only one IP address
+                }
+                const firstHost = [...networkAddress];
+                firstHost[3] += 1;
+                const lastHost = [...broadcastAddress];
+                lastHost[3] -= 1;
+                return `${firstHost.join('.')} - ${lastHost.join('.')}`;
+            }
+
+            function calculateSubnetMask(cidr) {
+                let subnetMask = [];
+                let fullOctets = Math.floor(cidr / 8);
+                let remainingBits = cidr % 8;
+
+                for (let i = 0; i < fullOctets; i++) {
+                    subnetMask.push(255);
+                }
+
+                if (remainingBits > 0) {
+                    let octetValue = 0;
+                    for (let i = 0; i < remainingBits; i++) {
+                        octetValue += Math.pow(2, 7 - i);
+                    }
+                    subnetMask.push(octetValue);
+                }
+
+                while (subnetMask.length < 4) {
+                    subnetMask.push(0);
+                }
+                return subnetMask;
+            }
+
+            function calculateCIDR(subnetMaskDecimal) {
+                let cidr = 0;
+                for (let octet of subnetMaskDecimal) {
+                    if (octet === 255) {
+                        cidr += 8;
+                    } else if (octet === 0) {
+                        continue;
+                    } else {
+                        let binaryString = octet.toString(2).padStart(8, '0');
+                        for (let bit of binaryString) {
+                            if (bit === '1') {
+                                cidr++;
+                            } else {
+                                return null; // Invalid subnet mask
+                            }
+                        }
+                    }
+                }
+                return cidr;
+            }
+        }
+
+        function resetFields() {
+            document.getElementById('ipAddress').value = '';
+            document.getElementById('subnetMask').value = '';
+            document.getElementById('resultsContent').innerHTML = `
+                <p><span class="font-semibold text-gray-700">Network Address:</span> <span id="networkAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Broadcast Address:</span> <span id="broadcastAddress" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">IP Class:</span> <span id="ipClass" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Number of Hosts:</span> <span id="numHosts" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Usable Host Range:</span> <span id="hostRange" class="text-blue-600"></span></p>
+                <p><span class="font-semibold text-gray-700">Subnet Mask (Decimal):</span> <span id="subnetMaskDecimal" class="text-blue-600"></span></p>
+                 <p><span class="font-semibold text-gray-700">Subnet Mask (CIDR):</span> <span id="subnetMaskCIDR" class="text-blue-600"></span></p>
+            `;
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('error-message').textContent = '';
+        }
+    </script>
+</body>
+</html>
