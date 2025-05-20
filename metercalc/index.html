@@ -73,34 +73,34 @@
             text-align: center;
             color: #0056b3;
         }
+        .detailed-breakdown {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff; /* Light blue background */
+            border: 1px solid #cfe2ff;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+        }
+        .detailed-breakdown h3 {
+            margin-top: 0;
+            color: #0056b3;
+            font-size: 18px;
+            border-bottom: 1px dashed #a0c3e7;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .detailed-breakdown p {
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #555;
+        }
+        .detailed-breakdown strong {
+            color: #007bff;
+        }
         .error-message {
             color: red;
             margin-top: 10px;
             text-align: center;
-        }
-        .rate-details {
-            margin-top: 40px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .rate-details h2 {
-            text-align: left;
-            margin-bottom: 15px;
-            color: #0056b3;
-        }
-        .rate-details ul {
-            list-style: none;
-            padding: 0;
-        }
-        .rate-details ul li {
-            background-color: #f9f9f9;
-            margin-bottom: 8px;
-            padding: 10px 15px;
-            border-radius: 4px;
-            border: 1px solid #e0e0e0;
-        }
-        .rate-details ul li strong {
-            color: #007bff;
         }
     </style>
 </head>
@@ -131,42 +131,26 @@
         </div>
         <div class="error-message" id="errorMessage"></div>
 
-        <div class="rate-details">
-            <h2>Rate Details</h2>
-
-            <h3>Home Use Rates:</h3>
-            <ul>
-                <li><strong>1 to 50 units:</strong> 50 MMK per unit</li>
-                <li><strong>51 to 100 units:</strong> 100 MMK per unit</li>
-                <li><strong>101 to 200 units:</strong> 150 MMK per unit</li>
-                <li><strong>Above 201 units:</strong> 300 MMK per unit</li>
-            </ul>
-
-            <h3>Industrial Use Rates:</h3>
-            <ul>
-                <li><strong>1 to 5000 units:</strong> 250 MMK per unit</li>
-                <li><strong>5001 to 20000 units:</strong> 400 MMK per unit</li>
-                <li><strong>Above 20001 units:</strong> 500 MMK per unit</li>
-            </ul>
-        </div>
+        <div class="detailed-breakdown" id="detailedBreakdown">
+            </div>
     </div>
 
     <script>
         function toggleUnitsInput() {
-            const usageType = document.getElementById('usageType').value;
             const unitsInputContainer = document.getElementById('unitsInputContainer');
             const unitsInput = document.getElementById('units');
+            const detailedBreakdown = document.getElementById('detailedBreakdown');
 
-            if (usageType === 'home' || usageType === 'industrial') {
+            unitsInput.value = ''; // Clear previous input
+            document.getElementById('totalCost').textContent = 'Total Cost: 0 MMK'; // Reset result
+            document.getElementById('errorMessage').textContent = ''; // Clear errors
+            detailedBreakdown.innerHTML = ''; // Clear breakdown
+            detailedBreakdown.style.display = 'none'; // Hide breakdown
+
+            if (document.getElementById('usageType').value !== "") {
                 unitsInputContainer.style.display = 'block';
-                unitsInput.value = ''; // Clear previous input
-                document.getElementById('totalCost').textContent = 'Total Cost: 0 MMK'; // Reset result
-                document.getElementById('errorMessage').textContent = ''; // Clear errors
             } else {
                 unitsInputContainer.style.display = 'none';
-                unitsInput.value = ''; // Clear input if no type selected
-                document.getElementById('totalCost').textContent = 'Total Cost: 0 MMK'; // Reset result
-                document.getElementById('errorMessage').textContent = ''; // Clear errors
             }
         }
 
@@ -175,13 +159,17 @@
             const unitsInput = document.getElementById('units');
             const totalCostDisplay = document.getElementById('totalCost');
             const errorMessageDisplay = document.getElementById('errorMessage');
+            const detailedBreakdown = document.getElementById('detailedBreakdown');
 
             let units = parseInt(unitsInput.value);
             let totalCost = 0;
+            let breakdownHtml = '<h3>Cost Breakdown:</h3>';
 
-            // Reset previous results and error messages
+            // Reset previous results, error messages, and breakdown
             totalCostDisplay.textContent = 'Total Cost: 0 MMK';
             errorMessageDisplay.textContent = '';
+            detailedBreakdown.innerHTML = '';
+            detailedBreakdown.style.display = 'none';
 
             if (usageType === "") {
                 errorMessageDisplay.textContent = 'Please select a usage type (Home Use or Industrial Use).';
@@ -193,27 +181,68 @@
                 return;
             }
 
+            if (units === 0) {
+                totalCostDisplay.textContent = 'Total Cost: 0 MMK';
+                detailedBreakdown.innerHTML = '<p>No units consumed, so no cost.</p>';
+                detailedBreakdown.style.display = 'block';
+                return;
+            }
+
             if (usageType === 'home') {
-                if (units <= 50) {
-                    totalCost = units * 50;
-                } else if (units <= 100) {
-                    totalCost = (50 * 50) + ((units - 50) * 100);
-                } else if (units <= 200) {
-                    totalCost = (50 * 50) + (50 * 100) + ((units - 100) * 150);
-                } else {
-                    totalCost = (50 * 50) + (50 * 100) + (100 * 150) + ((units - 200) * 300);
+                let remainingUnits = units;
+                if (remainingUnits > 0) {
+                    let unitsInTier = Math.min(remainingUnits, 50);
+                    let cost = unitsInTier * 50;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${unitsInTier} units @ <strong>50 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                    remainingUnits -= unitsInTier;
                 }
+                if (remainingUnits > 0) {
+                    let unitsInTier = Math.min(remainingUnits, 50); // 51-100, so 50 units
+                    let cost = unitsInTier * 100;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${unitsInTier} units @ <strong>100 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                    remainingUnits -= unitsInTier;
+                }
+                if (remainingUnits > 0) {
+                    let unitsInTier = Math.min(remainingUnits, 100); // 101-200, so 100 units
+                    let cost = unitsInTier * 150;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${unitsInTier} units @ <strong>150 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                    remainingUnits -= unitsInTier;
+                }
+                if (remainingUnits > 0) {
+                    let cost = remainingUnits * 300;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${remainingUnits} units @ <strong>300 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                }
+
             } else if (usageType === 'industrial') {
-                if (units <= 5000) {
-                    totalCost = units * 250;
-                } else if (units <= 20000) {
-                    totalCost = (5000 * 250) + ((units - 5000) * 400);
-                } else {
-                    totalCost = (5000 * 250) + (15000 * 400) + ((units - 20000) * 500);
+                let remainingUnits = units;
+                if (remainingUnits > 0) {
+                    let unitsInTier = Math.min(remainingUnits, 5000);
+                    let cost = unitsInTier * 250;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${unitsInTier.toLocaleString()} units @ <strong>250 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                    remainingUnits -= unitsInTier;
+                }
+                if (remainingUnits > 0) {
+                    let unitsInTier = Math.min(remainingUnits, 15000); // 5001-20000, so 15000 units
+                    let cost = unitsInTier * 400;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${unitsInTier.toLocaleString()} units @ <strong>400 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
+                    remainingUnits -= unitsInTier;
+                }
+                if (remainingUnits > 0) {
+                    let cost = remainingUnits * 500;
+                    totalCost += cost;
+                    breakdownHtml += `<p>${remainingUnits.toLocaleString()} units @ <strong>500 MMK/unit</strong> = ${cost.toLocaleString()} MMK</p>`;
                 }
             }
 
             totalCostDisplay.textContent = `Total Cost: ${totalCost.toLocaleString()} MMK`;
+            detailedBreakdown.innerHTML = breakdownHtml;
+            detailedBreakdown.style.display = 'block'; // Show the breakdown section
         }
     </script>
 </body>
