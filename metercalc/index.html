@@ -32,12 +32,17 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
+        .input-group select,
         .input-group input[type="number"] {
             width: calc(100% - 22px);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
+        }
+        #unitsInputContainer {
+            margin-top: 15px;
+            display: none; /* Hidden by default */
         }
         .button-group {
             text-align: center;
@@ -79,13 +84,17 @@
         <h1>Meter Unit Calculator</h1>
 
         <div class="input-group">
-            <label for="homeUnits">Home Use Units:</label>
-            <input type="number" id="homeUnits" placeholder="Enter units for home use" min="0">
+            <label for="usageType">Choose Usage Type:</label>
+            <select id="usageType" onchange="toggleUnitsInput()">
+                <option value="">--Select--</option>
+                <option value="home">Home Use</option>
+                <option value="industrial">Industrial Use</option>
+            </select>
         </div>
 
-        <div class="input-group">
-            <label for="industrialUnits">Industrial Use Units:</label>
-            <input type="number" id="industrialUnits" placeholder="Enter units for industrial use" min="0">
+        <div id="unitsInputContainer" class="input-group">
+            <label for="units">Enter Units:</label>
+            <input type="number" id="units" placeholder="Enter units consumed" min="0">
         </div>
 
         <div class="button-group">
@@ -99,52 +108,64 @@
     </div>
 
     <script>
+        function toggleUnitsInput() {
+            const usageType = document.getElementById('usageType').value;
+            const unitsInputContainer = document.getElementById('unitsInputContainer');
+            const unitsInput = document.getElementById('units');
+
+            if (usageType === 'home' || usageType === 'industrial') {
+                unitsInputContainer.style.display = 'block';
+                unitsInput.value = ''; // Clear previous input
+                document.getElementById('totalCost').textContent = 'Total Cost: 0 MMK'; // Reset result
+                document.getElementById('errorMessage').textContent = ''; // Clear errors
+            } else {
+                unitsInputContainer.style.display = 'none';
+                unitsInput.value = ''; // Clear input if no type selected
+                document.getElementById('totalCost').textContent = 'Total Cost: 0 MMK'; // Reset result
+                document.getElementById('errorMessage').textContent = ''; // Clear errors
+            }
+        }
+
         function calculateCost() {
-            const homeUnitsInput = document.getElementById('homeUnits');
-            const industrialUnitsInput = document.getElementById('industrialUnits');
+            const usageType = document.getElementById('usageType').value;
+            const unitsInput = document.getElementById('units');
             const totalCostDisplay = document.getElementById('totalCost');
             const errorMessageDisplay = document.getElementById('errorMessage');
 
-            let homeUnits = parseInt(homeUnitsInput.value);
-            let industrialUnits = parseInt(industrialUnitsInput.value);
+            let units = parseInt(unitsInput.value);
+            let totalCost = 0;
 
             // Reset previous results and error messages
             totalCostDisplay.textContent = 'Total Cost: 0 MMK';
             errorMessageDisplay.textContent = '';
 
-            if (isNaN(homeUnits) && isNaN(industrialUnits)) {
-                errorMessageDisplay.textContent = 'Please enter units for either Home Use or Industrial Use.';
+            if (usageType === "") {
+                errorMessageDisplay.textContent = 'Please select a usage type (Home Use or Industrial Use).';
                 return;
             }
 
-            if (homeUnits < 0 || industrialUnits < 0) {
-                errorMessageDisplay.textContent = 'Units cannot be negative.';
+            if (isNaN(units) || units < 0) {
+                errorMessageDisplay.textContent = 'Please enter a valid positive number of units.';
                 return;
             }
 
-            let totalCost = 0;
-
-            // Calculate Home Use Cost
-            if (!isNaN(homeUnits) && homeUnits >= 0) {
-                if (homeUnits <= 50) {
-                    totalCost += homeUnits * 50;
-                } else if (homeUnits <= 100) {
-                    totalCost += (50 * 50) + ((homeUnits - 50) * 100);
-                } else if (homeUnits <= 200) {
-                    totalCost += (50 * 50) + (50 * 100) + ((homeUnits - 100) * 150);
+            if (usageType === 'home') {
+                if (units <= 50) {
+                    totalCost = units * 50;
+                } else if (units <= 100) {
+                    totalCost = (50 * 50) + ((units - 50) * 100);
+                } else if (units <= 200) {
+                    totalCost = (50 * 50) + (50 * 100) + ((units - 100) * 150);
                 } else {
-                    totalCost += (50 * 50) + (50 * 100) + (100 * 150) + ((homeUnits - 200) * 300);
+                    totalCost = (50 * 50) + (50 * 100) + (100 * 150) + ((units - 200) * 300);
                 }
-            }
-
-            // Calculate Industrial Use Cost
-            if (!isNaN(industrialUnits) && industrialUnits >= 0) {
-                if (industrialUnits <= 5000) {
-                    totalCost += industrialUnits * 250;
-                } else if (industrialUnits <= 20000) {
-                    totalCost += (5000 * 250) + ((industrialUnits - 5000) * 400);
+            } else if (usageType === 'industrial') {
+                if (units <= 5000) {
+                    totalCost = units * 250;
+                } else if (units <= 20000) {
+                    totalCost = (5000 * 250) + ((units - 5000) * 400);
                 } else {
-                    totalCost += (5000 * 250) + (15000 * 400) + ((industrialUnits - 20000) * 500);
+                    totalCost = (5000 * 250) + (15000 * 400) + ((units - 20000) * 500);
                 }
             }
 
