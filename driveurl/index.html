@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Direct Link Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full text-center">
+        <h1 class="text-3xl font-bold mb-4 text-gray-800">Google Drive Direct Link Generator</h1>
+        <p class="text-gray-600 mb-6">
+            Google Drive sharing link ကို အောက်က box ထဲမှာ ထည့်ပြီး Direct Link ကို ယူပါ
+        </p>
+        <div class="space-y-4">
+            <input type="text" id="shareLinkInput" placeholder="Google Drive sharing link ကို ဒီနေရာမှာ ထည့်ပါ..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            <div id="outputContainer" class="hidden">
+                <input type="text" id="directLinkOutput" readonly class="w-full p-3 border border-gray-300 bg-gray-50 rounded-lg text-blue-600 font-mono text-sm">
+                <button id="copyButton" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transform transition duration-200 hover:scale-105">
+                    Link ကို ကူးယူပါ
+                </button>
+            </div>
+            <div id="errorMessage" class="text-red-500 mt-2 text-sm hidden">
+                မှားယွင်းသော link ပုံစံဖြစ်နေပါသည်။ မှန်ကန်သော Google Drive sharing link ကို ထည့်သွင်းပါ။
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const shareLinkInput = document.getElementById('shareLinkInput');
+            const directLinkOutput = document.getElementById('directLinkOutput');
+            const outputContainer = document.getElementById('outputContainer');
+            const copyButton = document.getElementById('copyButton');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // input field ကို listen လုပ်ရန်
+            shareLinkInput.addEventListener('input', () => {
+                const url = shareLinkInput.value;
+                const fileId = extractFileId(url);
+
+                if (fileId) {
+                    const directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    directLinkOutput.value = directLink;
+                    outputContainer.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                } else {
+                    outputContainer.classList.add('hidden');
+                    if (url.length > 0) {
+                        errorMessage.classList.remove('hidden');
+                    } else {
+                        errorMessage.classList.add('hidden');
+                    }
+                }
+            });
+
+            // sharing link ကနေ file ID ကို ရှာဖွေပေးတဲ့ function
+            function extractFileId(url) {
+                // file ID ပါဝင်နိုင်တဲ့ ပုံစံအမျိုးမျိုးကို စစ်ဆေး
+                const fileIdRegex = /(?:id=|file\/d\/)([a-zA-Z0-9_-]{28,})/i;
+                const match = url.match(fileIdRegex);
+                return match ? match[1] : null;
+            }
+
+            // ကူးယူရန် ခလုတ်ကို listen လုပ်ရန်
+            copyButton.addEventListener('click', () => {
+                // Clipboard ထဲသို့ ကူးယူပါ
+                directLinkOutput.select();
+                directLinkOutput.setSelectionRange(0, 99999); // Mobile device များအတွက်
+                try {
+                    document.execCommand('copy');
+                    alert('Link ကို ကူးယူပြီးပါပြီ။'); // Custom alert အစား ရိုးရှင်းသော alert ကိုသုံးပါ။
+                } catch (err) {
+                    console.error('Failed to copy text:', err);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
