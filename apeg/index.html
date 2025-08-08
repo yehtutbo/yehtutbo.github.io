@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Podcast Embed Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Apple Podcast Embed Generator</h1>
+        <p>Apple Podcasts episode သို့မဟုတ် podcast link ကို အောက်တွင် ထည့်ပါ။</p>
+        <input type="text" id="podcastUrl" placeholder="https://podcasts.apple.com/us/podcast/...">
+        <button id="generateBtn">Generate Embed Code</button>
+        
+        <div id="result" class="result-box">
+            <h3>Generated Embed Code:</h3>
+            <textarea id="embedCode" rows="6" readonly></textarea>
+            <button id="copyBtn">Copy Code</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
