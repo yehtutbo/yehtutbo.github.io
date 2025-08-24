@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>အားကစားပွဲစဉ်ဇယား (မြန်မာစံတော်ချိန်)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; color: #0056b3; margin-bottom: 5px; }
+        .timezone-info { text-align: center; font-size: 0.9em; color: #666; margin-bottom: 20px; }
+        .day-heading { background-color: #0056b3; color: white; padding: 12px; text-align: center; font-size: 1.5em; margin-top: 30px; border-radius: 8px; }
+        .schedule-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .schedule-table th, .schedule-table td { padding: 12px 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        .schedule-table th { background-color: #e2eaf4; color: #333; font-weight: bold; }
+        .schedule-table tr:hover { background-color: #f1f1f1; }
+        .play-button { background-color: #28a745; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px; text-decoration: none; display: inline-block; font-weight: bold; transition: background-color 0.3s ease; }
+        .play-button:hover { background-color: #218838; }
+        .info-text { font-size: 0.8em; color: #888; margin-top: 20px; text-align: center; }
+        
+        .video-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 1000;
+        }
+        .video-container.active {
+            display: block;
+        }
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>အားကစားပွဲစဉ်ဇယား</h1>
+    <div class="timezone-info">အချိန်အားလုံးကို မြန်မာစံတော်ချိန် (MMT, GMT+6:30) ဖြင့် ဖော်ပြထားသည်။</div>
+    
+    <div id="schedule">
+        <p style="text-align: center;">ပွဲစဉ်ဇယားကို ဆွဲယူနေပါသည်...</p>
+    </div>
+    
+</div>
+
+<div id="videoContainer" class="video-container">
+    </div>
+
+<script>
+    async function fetchAndDisplaySchedule() {
+        const scheduleDiv = document.getElementById('schedule');
+        const videoContainer = document.getElementById('videoContainer');
+        const sourceUrl = 'https://sportsonline.pk/prog.txt';
+
+        try {
+            const response = await fetch(sourceUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const rawSchedule = await response.text();
+            
+            let htmlOutput = '';
+            let currentDay = '';
+            let tableOpen = false;
+            const lines = rawSchedule.split('\n');
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (trimmedLine.length === 0 || trimmedLine.startsWith('=')) {
+                    return;
+                }
+
+                const dayMatch = trimmedLine.match(/^(SUNDAY|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY)/i);
+                if (dayMatch) {
+                    if (tableOpen) {
+                        htmlOutput += `</tbody></table>`;
+                        tableOpen = false;
+                    }
+                    currentDay = dayMatch[0].toUpperCase();
+                    htmlOutput += `<div class="day-heading">${currentDay}</div>`;
+                    htmlOutput += `<table class="schedule-table"><thead><tr><th>အချိန် (MMT)</th><th>ပွဲစဉ်</th><th>လင့်ခ်</th></tr></thead><tbody>`;
+                    tableOpen = true;
+                    return;
+                }
+                
+                if (trimmedLine.includes('https://sportzonline.site/')) {
+                    const parts = trimmedLine.split('|');
+                    if (parts.length >= 2) {
+                        const timeAndEvent = parts[0].trim().split(/\s+/);
+                        let time = timeAndEvent[0];
+                        const event = timeAndEvent.slice(1).join(' ');
+                        const url = parts[1].trim();
+
+                        if (time.includes(':')) {
+                            const [hours, minutes] = time.split(':').map(Number);
+                            const totalMinutesOriginal = hours * 60 + minutes;
+                            const totalMinutesMMT = totalMinutesOriginal + 5 * 60 + 30;
+
+                            const mmtHours = Math.floor(totalMinutesMMT / 60) % 24;
+                            const mmtMinutes = totalMinutesMMT % 60;
+                            
+                            const mmtHoursPadded = String(mmtHours).padStart(2, '0');
+                            const mmtMinutesPadded = String(mmtMinutes).padStart(2, '0');
+                            time = `${mmtHoursPadded}:${mmtMinutesPadded}`;
+                        }
+
+                        htmlOutput += `<tr>`;
+                        htmlOutput += `<td>${time}</td>`;
+                        htmlOutput += `<td>${event}</td>`;
+                        htmlOutput += `<td><button class="play-button" onclick="playVideo('${url}')">ကြည့်ရန်</button></td>`;
+                        htmlOutput += `</tr>`;
+                    }
+                }
+            });
+            
+            if (tableOpen) {
+                htmlOutput += `</tbody></table>`;
+            }
+            scheduleDiv.innerHTML = htmlOutput;
+
+            // Make the playVideo function globally accessible
+            window.playVideo = (url) => {
+                videoContainer.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
+                videoContainer.classList.add('active');
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) {
+                    videoContainer.msRequestFullscreen();
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching the schedule:', error);
+            scheduleDiv.innerHTML = `<p style="color:red; text-align:center;">ပွဲစဉ်ဇယားကို ဆွဲယူရာတွင် အမှားအယွင်းတစ်ခု ဖြစ်ပွားခဲ့ပါသည်။</p>`;
+        }
+    }
+
+    // Full-screen ကနေ ထွက်သွားရင် video container ကို ပိတ်ရန်
+    document.addEventListener('fullscreenchange', (event) => {
+        if (!document.fullscreenElement) {
+            const videoContainer = document.getElementById('videoContainer');
+            if (videoContainer) {
+                videoContainer.classList.remove('active');
+                videoContainer.innerHTML = '';
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', fetchAndDisplaySchedule);
+</script>
+
+</body>
+</html>
