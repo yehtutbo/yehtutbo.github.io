@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#080b0e"/>
+  <rect width="32" height="2" y="0" fill="#ff2233"/>
+  <text x="16" y="21" font-size="10" font-family="monospace" font-weight="900" text-anchor="middle" fill="#ffffff">YHB</text>
+  <circle cx="26" cy="7" r="3" fill="#ff2233" opacity="0.9"/>
+</svg>
