@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>YHB Restream</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #0d1018;
+  --bg-card:   #141922;
+  --bg-deep:   #0a0d13;
+  --bg-hover:  #1a2230;
+  --border:    #1e2d40;
+  --border-hi: #2a3d54;
+
+  --text:      #e8edf5;
+  --text-2:    #9aafc4;
+  --text-3:    #5a7090;
+  --text-dim:  #2d4060;
+
+  --blue:      #2d7ef7;
+  --blue-lt:   #5b9cfa;
+  --blue-dim:  rgba(45,126,247,.12);
+
+  --green:     #1db954;
+  --green-lt:  #3dd068;
+  --green-dim: rgba(29,185,84,.12);
+
+  --red:       #e8394a;
+  --red-lt:    #f06070;
+  --red-dim:   rgba(232,57,74,.12);
+
+  --amber:     #f0a020;
+  --amber-lt:  #f5be58;
+  --amber-dim: rgba(240,160,32,.12);
+
+  --teal:      #16c4b0;
+  --teal-lt:   #40d8c6;
+  --teal-dim:  rgba(22,196,176,.12);
+
+  --r:         8px;
+  --r-sm:      5px;
+  --r-lg:      12px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle vignette */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, rgba(45,126,247,.06) 0%, transparent 60%);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════════════════════ */
+#authScreen {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: var(--bg); align-items: center; justify-content: center;
+  padding: 20px;
+}
+#authScreen.show { display: flex; }
+
+.auth-wrap {
+  width: 100%; max-width: 400px;
+  animation: slideUp .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.auth-brand {
+  text-align: center; margin-bottom: 28px;
+}
+.auth-brand-title {
+  font-size: 22px; font-weight: 700; color: var(--text);
+  letter-spacing: -.3px;
+}
+.auth-brand-title em { color: var(--blue-lt); font-style: normal; }
+.auth-brand-sub {
+  font-size: 12px; color: var(--text-3); margin-top: 4px;
+  font-weight: 500; letter-spacing: .04em; text-transform: uppercase;
+}
+
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+}
+
+.auth-card-title {
+  font-size: 16px; font-weight: 700; margin-bottom: 18px; color: var(--text);
+}
+
+.f-group { margin-bottom: 14px; }
+.f-label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--text-2); margin-bottom: 5px; letter-spacing: .02em;
+}
+.f-input {
+  width: 100%; background: var(--bg-deep); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 11px 14px;
+  color: var(--text); font-family: inherit; font-size: 15px;
+  outline: none; transition: border-color .18s, box-shadow .18s;
+  -webkit-appearance: none;
+}
+.f-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(45,126,247,.18);
+}
+
+.pw-bar { height: 2px; background: var(--border); border-radius: 1px; margin-top: 5px; overflow: hidden; }
+.pw-bar-fill { height: 100%; width: 0; border-radius: 1px; transition: width .25s, background .25s; }
+
+.auth-submit {
+  width: 100%; margin-top: 6px; padding: 13px;
+  background: var(--blue); color: #fff; border: none;
+  border-radius: var(--r); font-family: inherit; font-size: 15px;
+  font-weight: 700; cursor: pointer; transition: background .15s, transform .1s;
+  -webkit-appearance: none;
+}
+.auth-submit:hover { background: #1a6ee0; }
+.auth-submit:active { transform: scale(.99); }
+.auth-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.auth-msg { display: none; margin-top: 12px; padding: 10px 13px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; }
+.auth-msg.err { display: block; background: var(--red-dim); border: 1px solid rgba(232,57,74,.3); color: var(--red-lt); }
+.auth-msg.ok  { display: block; background: var(--green-dim); border: 1px solid rgba(29,185,84,.3); color: var(--green-lt); }
+
+.att-row { display: flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 12px; color: var(--text-3); }
+.att-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); }
+.att-dot.used { background: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════════════════════════ */
+#appScreen { display: none; min-height: 100vh; }
+#appScreen.show { display: flex; flex-direction: column; }
+
+/* ── Top bar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,16,24,.96); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  height: 54px; display: flex; align-items: center;
+  padding: 0 16px; gap: 12px; flex-shrink: 0;
+}
+
+.tb-brand {
+  font-size: 16px; font-weight: 800; color: var(--text);
+  letter-spacing: -.3px; display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+}
+.tb-brand em { color: var(--blue-lt); font-style: normal; }
+
+.tb-signal {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 20px; border: 1.5px solid;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  transition: all .4s; white-space: nowrap;
+}
+.tb-signal.live  { color: var(--green-lt); border-color: var(--green); background: var(--green-dim); }
+.tb-signal.idle  { color: var(--text-3);   border-color: var(--border);  background: transparent; }
+.tb-signal-dot   { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.tb-signal.live .tb-signal-dot { animation: pulse 1.4s ease-in-out infinite; }
+
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.7)} }
+
+.tb-clock {
+  font-family: 'DM Mono', monospace; font-size: 13px;
+  color: var(--amber); font-weight: 500; letter-spacing: .03em;
+}
+
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.tb-user {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 10px; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 20px;
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+}
+.tb-av {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+}
+
+/* ── Buttons ── */
+.btn {
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  padding: 7px 13px; border-radius: var(--r-sm); border: 1.5px solid;
+  cursor: pointer; background: transparent; transition: all .15s;
+  display: inline-flex; align-items: center; gap: 5px;
+  white-space: nowrap; -webkit-appearance: none;
+  /* good touch target */
+  min-height: 36px;
+}
+.btn:active { transform: scale(.97); }
+
+.btn-ghost  { color: var(--text-3); border-color: var(--border); }
+.btn-ghost:hover { color: var(--text-2); border-color: var(--border-hi); }
+.btn-red    { color: var(--red-lt); border-color: var(--red); }
+.btn-red:hover { background: var(--red-dim); }
+.btn-green  { color: var(--green-lt); border-color: var(--green); }
+.btn-green:hover { background: var(--green-dim); }
+.btn-blue   { color: var(--blue-lt); border-color: var(--blue); }
+.btn-blue:hover { background: var(--blue-dim); }
+.btn-amber  { color: var(--amber-lt); border-color: var(--amber); }
+.btn-amber:hover { background: var(--amber-dim); }
+
+.btn-solid-green { background: var(--green); color: #000; border-color: var(--green); font-weight: 700; }
+.btn-solid-green:hover { background: var(--green-lt); }
+.btn-solid-blue  { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-solid-blue:hover { background: #1a6ee0; }
+
+.btn-sm  { padding: 5px 10px; font-size: 12px; min-height: 30px; }
+.btn-xs  { padding: 3px 8px;  font-size: 11px; min-height: 26px; }
+.btn-icon { padding: 7px; min-height: 36px; }
+
+/* ── Page body ── */
+.page { flex: 1; padding: 16px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+/* ── Signal strip ── */
+.signal-strip {
+  display: grid; grid-template-columns: repeat(2,1fr);
+  gap: 10px; margin-bottom: 14px;
+}
+
+.sig-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 15px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sig-icon {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.sig-icon.blue  { background: var(--blue-dim); }
+.sig-icon.green { background: var(--green-dim); }
+.sig-icon.amber { background: var(--amber-dim); }
+.sig-icon.red   { background: var(--red-dim); }
+.sig-body { min-width: 0; }
+.sig-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.sig-val   { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.1; }
+.sig-val.live { color: var(--green-lt); }
+.sig-sub   { font-size: 11px; color: var(--text-3); margin-top: 1px; font-weight: 500; }
+
+/* ── Section header ── */
+.sec-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; margin-top: 16px;
+}
+.sec-hd:first-child { margin-top: 0; }
+.sec-title { font-size: 13px; font-weight: 700; color: var(--text-2); letter-spacing: .01em; }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 12px;
+}
+.card-head {
+  padding: 11px 15px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; background: rgba(255,255,255,.02);
+}
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-2); }
+.card-body  { padding: 15px; }
+.card-body-sm { padding: 12px 14px; }
+
+/* ── Bitrate meters ── */
+.bw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+.bw-meter {}
+.bw-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.bw-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); }
+.bw-val { font-family: 'DM Mono', monospace; font-size: 17px; font-weight: 500; }
+.bw-val.in  { color: var(--blue-lt); }
+.bw-val.out { color: var(--green-lt); }
+
+.bw-track {
+  height: 6px; background: var(--bg-deep); border-radius: 3px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.bw-fill { height: 100%; width: 0; border-radius: 3px; transition: width .7s ease; }
+.bw-fill.in  { background: linear-gradient(90deg, #1557c4, var(--blue-lt)); }
+.bw-fill.out { background: linear-gradient(90deg, #0d8040, var(--green-lt)); }
+
+.bw-sub { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+
+#bitrateChart {
+  width: 100%; height: 60px; display: block;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: var(--r-sm); margin-bottom: 10px;
+}
+
+.traffic-row {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  padding-top: 10px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--text-3); font-weight: 500;
+}
+.traffic-row .in-v  { color: var(--blue-lt); font-weight: 600; }
+.traffic-row .out-v { color: var(--green-lt); font-weight: 600; }
+.traffic-row strong { color: var(--text-2); font-weight: 600; }
+.traffic-row .ml { margin-left: auto; }
+
+/* ── Ingest URL ── */
+.ingest-box {
+  background: var(--bg-deep); border: 1.5px solid var(--border);
+  border-left: 3px solid var(--amber); border-radius: var(--r-sm);
+  padding: 13px 14px; cursor: pointer; transition: border-color .18s;
+  position: relative; margin-bottom: 12px;
+}
+.ingest-box:hover { border-color: var(--blue); border-left-color: var(--blue); }
+.ingest-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--amber); margin-bottom: 6px; }
+.ingest-url { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); word-break: break-all; line-height: 1.55; }
+.ingest-url .host { color: var(--text-3); }
+.ingest-url .addr { color: var(--blue-lt); }
+.ingest-hint { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--blue-lt); font-weight: 600; opacity: 0; transition: opacity .18s; }
+.ingest-box:hover .ingest-hint { opacity: 1; }
+#ingestUrlReal { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+
+.key-row { display: flex; gap: 7px; align-items: center; }
+.key-lbl { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+.key-wrap { flex: 1; position: relative; min-width: 0; }
+.key-input {
+  width: 100%; background: var(--bg-deep); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 34px 8px 11px;
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+  outline: none; transition: border-color .18s; min-height: 36px;
+}
+.key-input:focus { border-color: var(--blue); }
+.key-eye {
+  position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--text-3);
+  font-size: 14px; padding: 0; transition: color .15s; line-height: 1;
+}
+.key-eye:hover { color: var(--blue-lt); }
+
+/* ── Dest cards ── */
+.dest-list { display: flex; flex-direction: column; gap: 8px; }
+.dest-empty { text-align: center; padding: 24px; color: var(--text-3); font-size: 14px; }
+
+.dest-card {
+  background: var(--bg-deep); border: 1.5px solid var(--border);
+  border-left: 3px solid var(--border); border-radius: var(--r-sm);
+  padding: 12px 13px; transition: all .25s;
+}
+.dest-card.live    { border-left-color: var(--green); background: rgba(29,185,84,.04); }
+.dest-card.conn    { border-left-color: var(--amber); background: rgba(240,160,32,.04); }
+.dest-card.stopped { border-left-color: var(--border); }
+
+.dest-top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 8px; }
+.dest-name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 7px; min-width: 0; }
+.dest-name-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dest-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dest-dot.live    { background: var(--green); box-shadow: 0 0 5px var(--green); animation: pulse 1.4s infinite; }
+.dest-dot.conn    { background: var(--amber); }
+.dest-dot.stopped { background: var(--text-dim); }
+
+.plat { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid; flex-shrink: 0; }
+.plat.youtube  { color: #f87171; border-color: rgba(248,113,113,.4); }
+.plat.facebook { color: var(--blue-lt); border-color: rgba(91,156,250,.4); }
+.plat.twitch   { color: #c084fc; border-color: rgba(192,132,252,.4); }
+.plat.tiktok   { color: #fb7185; border-color: rgba(251,113,133,.4); }
+.plat.custom   { color: var(--teal-lt); border-color: rgba(64,216,198,.4); }
+
+.dest-url { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-3); margin-bottom: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dest-stats { font-size: 12px; color: var(--text-3); display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; font-weight: 500; }
+.dest-stats strong { color: var(--text-2); }
+.dest-actions { display: flex; gap: 6px; }
+
+/* ── Settings ── */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+.setting-lbl { font-size: 14px; font-weight: 600; color: var(--text); }
+.setting-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+.toggle {
+  width: 40px; height: 22px; background: var(--border);
+  border: 1.5px solid var(--border); border-radius: 11px;
+  cursor: pointer; position: relative; transition: background .25s, border-color .25s;
+  flex-shrink: 0; min-width: 40px;
+}
+.toggle.on { background: var(--green); border-color: var(--green); }
+.toggle::after {
+  content: ''; width: 15px; height: 15px; background: #fff; border-radius: 50%;
+  position: absolute; top: 2px; left: 2px; transition: left .25s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.toggle.on::after { left: 21px; }
+
+/* ── Log ── */
+.log-area {
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: var(--r-sm); height: 170px; overflow-y: auto;
+  font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.8;
+  padding: 8px 10px;
+}
+.log-line        { color: var(--text-3); }
+.log-line.start  { color: var(--green-lt); }
+.log-line.stop   { color: var(--red-lt); }
+.log-line.error  { color: var(--amber-lt); }
+.log-line.auth   { color: var(--blue-lt); }
+.log-line.ingest { color: var(--teal-lt); }
+.log-line.auto   { color: var(--amber-lt); }
+.log-line.warn   { color: var(--amber-lt); }
+
+/* ── History ── */
+.hist-list  { display: flex; flex-direction: column; gap: 7px; }
+.hist-empty { text-align: center; padding: 20px; color: var(--text-3); font-size: 13px; }
+
+.hist-card {
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 11px 13px;
+  transition: border-color .18s;
+}
+.hist-card:hover { border-color: var(--border-hi); }
+.hist-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 8px; }
+.hist-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber); font-weight: 500; }
+.hist-dur  { font-size: 14px; font-weight: 700; color: var(--text); }
+.hist-dests { font-size: 12px; color: var(--text-3); margin-bottom: 5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-bw { display: flex; gap: 12px; font-size: 12px; font-weight: 600; }
+.hist-rx { color: var(--blue-lt); }
+.hist-tx { color: var(--green-lt); }
+
+/* ── Modal ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  backdrop-filter: blur(6px); z-index: 1000; align-items: center;
+  justify-content: center; padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card); border: 1px solid var(--border-hi);
+  border-radius: var(--r-lg); width: 100%; max-width: 460px;
+  max-height: 90vh; overflow-y: auto;
+  animation: scaleIn .18s ease;
+  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+}
+@keyframes scaleIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+
+.modal-head {
+  padding: 15px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+}
+.modal-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.modal-x { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px; }
+.modal-x:hover { color: var(--red-lt); }
+.modal-body { padding: 18px; }
+.modal-foot { padding: 13px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+.modal-err { display: none; padding: 9px 12px; background: var(--red-dim); border: 1px solid rgba(232,57,74,.3); border-radius: var(--r-sm); color: var(--red-lt); font-size: 13px; font-weight: 500; margin-bottom: 13px; }
+.modal-err.show { display: block; }
+
+.preset-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 15px; }
+.preset-btn {
+  padding: 9px 4px; text-align: center; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); background: var(--bg-deep);
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  color: var(--text-3); cursor: pointer; transition: all .15s;
+}
+.preset-btn:hover { color: var(--text); border-color: var(--border-hi); }
+.preset-btn.yt { border-color: rgba(248,113,113,.5); color: #f87171; }
+.preset-btn.fb { border-color: rgba(91,156,250,.5);  color: var(--blue-lt); }
+.preset-btn.tw { border-color: rgba(192,132,252,.5); color: #c084fc; }
+.preset-btn.tt { border-color: rgba(251,113,133,.5); color: #fb7185; }
+
+.f-select {
+  width: 100%; background: var(--bg-deep); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 10px 12px; color: var(--text);
+  font-family: inherit; font-size: 14px; outline: none; cursor: pointer;
+  -webkit-appearance: none; min-height: 42px;
+}
+.f-select:focus { border-color: var(--blue); }
+
+/* ── Toast ── */
+.toasts { position: fixed; bottom: 16px; right: 16px; z-index: 5000; display: flex; flex-direction: column; gap: 7px; max-width: 300px; }
+.toast { padding: 10px 14px; border-radius: var(--r); border: 1px solid; font-size: 13px; font-weight: 600; animation: toastIn .2s ease; }
+@keyframes toastIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+.toast.ok  { background: var(--green-dim); border-color: rgba(29,185,84,.35); color: var(--green-lt); }
+.toast.err { background: var(--red-dim);   border-color: rgba(232,57,74,.35); color: var(--red-lt); }
+.toast.inf { background: var(--blue-dim);  border-color: rgba(45,126,247,.35); color: var(--blue-lt); }
+
+/* ── Session banner ── */
+.session-bar {
+  display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: var(--red-dim); border-bottom: 1px solid rgba(232,57,74,.4);
+  padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--red-lt);
+  align-items: center; justify-content: center; gap: 10px;
+}
+.session-bar.show { display: flex; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP LAYOUT (≥ 900px)
+═══════════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  .topbar { padding: 0 24px; gap: 16px; }
+  .page   { padding: 20px 24px; }
+
+  .signal-strip { grid-template-columns: repeat(4,1fr); }
+
+  /* Two-column main grid */
+  .desktop-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .log-area { height: 190px; }
+}
+
+@media (min-width: 1200px) {
+  .desktop-grid { grid-template-columns: 1fr 360px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE TWEAKS (< 600px)
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 599px) {
+  .topbar { height: 50px; gap: 8px; }
+  .tb-brand { font-size: 15px; }
+  .tb-clock { display: none; }
+  .tb-user  { display: none; }
+
+  /* Bottom nav for mobile */
+  .mob-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; height: 56px;
+  }
+  .mob-nav-btn {
+    flex: 1; background: none; border: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; color: var(--text-3);
+    font-family: inherit; font-size: 10px; font-weight: 600;
+    transition: color .15s;
+  }
+  .mob-nav-btn.active { color: var(--blue-lt); }
+  .mob-nav-btn svg { width: 20px; height: 20px; }
+
+  /* Tab panels */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .page { padding: 12px 12px 72px; }
+  .signal-strip { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sig-card { padding: 11px 12px; }
+  .sig-val  { font-size: 18px; }
+  .bw-grid  { grid-template-columns: 1fr; gap: 10px; }
+  .preset-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+@media (min-width: 600px) {
+  .mob-nav { display: none; }
+  .tab-panel { display: block !important; }
+  /* History lives in right column on desktop — hide mobile tab version */
+  #tab-history { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ AUTH ═══════════════════════ -->
+<div id="authScreen">
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-brand-title">YHB <em>Restream</em></div>
+      <div class="auth-brand-sub">Broadcast Control</div>
+    </div>
+
+    <!-- Login -->
+    <div class="auth-card" id="loginCard">
+      <div class="auth-card-title">Sign In</div>
+      <div class="f-group">
+        <label class="f-label">Username</label>
+        <input class="f-input" id="loginUser" type="text" autocomplete="username" placeholder="admin">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Password</label>
+        <input class="f-input" id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="auth-submit" id="loginBtn" onclick="doLogin()">Sign In</button>
+      <div class="auth-msg err" id="loginErr"></div>
+      <div id="attemptsWrap" style="display:none">
+        <div class="att-row" id="attemptsBar"></div>
+      </div>
+    </div>
+
+    <!-- Setup -->
+    <div class="auth-card" id="setupCard" style="display:none">
+      <div class="auth-card-title">Create Admin Account</div>
+      <div class="f-group">
+        <label class="f-label">Username</label>
+        <input class="f-input" id="setupUser" type="text" autocomplete="username" placeholder="admin">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Password <span style="color:var(--text-3);font-weight:400">(min 8 chars)</span></label>
+        <input class="f-input" id="setupPass" type="password" autocomplete="new-password" placeholder="••••••••" oninput="checkPwStr(this.value)">
+        <div class="pw-bar"><div class="pw-bar-fill" id="pwFill"></div></div>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Confirm Password</label>
+        <input class="f-input" id="setupPass2" type="password" autocomplete="new-password" placeholder="••••••••">
+      </div>
+      <button class="auth-submit" id="setupBtn" onclick="doSetup()">Create Account</button>
+      <div class="auth-msg err" id="setupErr"></div>
+      <div class="auth-msg ok"  id="setupOk"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Session banner -->
+<div class="session-bar" id="sessionBar">
+  Session expired —
+  <a href="#" onclick="logout()" style="color:inherit;font-weight:800">Sign in again</a>
+</div>
+
+<!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
+<div id="appScreen">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="tb-brand">YHB <em>Restream</em></div>
+    <div class="tb-signal idle" id="livePill">
+      <div class="tb-signal-dot"></div>
+      <span id="livePillText">No Signal</span>
+    </div>
+    <div class="tb-clock" id="clockEl">--:--:--</div>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-av" id="userAv">?</div>
+        <span id="userLbl">—</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('changePwModal')">PW</button>
+      <button class="btn btn-red btn-sm" onclick="logout()">Out</button>
+    </div>
+  </div>
+
+  <!-- Page body -->
+  <div class="page">
+
+    <!-- Signal strip — always visible -->
+    <div class="signal-strip">
+      <div class="sig-card">
+        <div class="sig-icon blue">📡</div>
+        <div class="sig-body">
+          <div class="sig-label">Ingest</div>
+          <div class="sig-val" id="statSignal" style="font-size:16px">● Idle</div>
+          <div class="sig-sub" id="statSignalSub">Waiting</div>
+        </div>
+      </div>
+      <div class="sig-card">
+        <div class="sig-icon green">▶</div>
+        <div class="sig-body">
+          <div class="sig-label">Outputs</div>
+          <div class="sig-val" id="statActive">0</div>
+          <div class="sig-sub" id="statActiveSub">0 destinations</div>
+        </div>
+      </div>
+      <div class="sig-card">
+        <div class="sig-icon blue">↓</div>
+        <div class="sig-body">
+          <div class="sig-label">In Rate</div>
+          <div class="sig-val" id="statBwIn" style="color:var(--blue-lt);font-size:15px">—</div>
+          <div class="sig-sub">From encoder</div>
+        </div>
+      </div>
+      <div class="sig-card">
+        <div class="sig-icon green">↑</div>
+        <div class="sig-body">
+          <div class="sig-label">Out Rate</div>
+          <div class="sig-val" id="statBwOut" style="color:var(--green-lt);font-size:15px">—</div>
+          <div class="sig-sub">Total relay</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop: 2-col grid / Mobile: tab panels -->
+    <div class="desktop-grid">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div>
+        <!-- Tab panel: Main -->
+        <div class="tab-panel active" id="tab-main">
+
+          <!-- Bitrate monitor -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">📊 Realtime Bitrate</span>
+              <div style="display:flex;gap:6px;align-items:center">
+                <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-3)" id="bwTs"></span>
+                <button class="btn btn-ghost btn-xs" onclick="resetTraffic()">↺ Reset</button>
+              </div>
+            </div>
+            <div class="card-body-sm">
+              <div class="bw-grid">
+                <div class="bw-meter">
+                  <div class="bw-top">
+                    <span class="bw-label">▼ Ingest In</span>
+                    <span class="bw-val in" id="bwInVal">—</span>
+                  </div>
+                  <div class="bw-track"><div class="bw-fill in" id="bwInBar"></div></div>
+                  <div class="bw-sub">
+                    <span>0</span>
+                    <span id="bwInPeak">Peak: —</span>
+                    <span id="bwInMax">—</span>
+                  </div>
+                </div>
+                <div class="bw-meter">
+                  <div class="bw-top">
+                    <span class="bw-label">▲ Output Out</span>
+                    <span class="bw-val out" id="bwOutVal">—</span>
+                  </div>
+                  <div class="bw-track"><div class="bw-fill out" id="bwOutBar"></div></div>
+                  <div class="bw-sub">
+                    <span>0</span>
+                    <span id="bwOutPeak">Peak: —</span>
+                    <span id="bwOutMax">—</span>
+                  </div>
+                </div>
+              </div>
+              <canvas id="bitrateChart" height="60"></canvas>
+              <div class="traffic-row">
+                <span>RX: <span class="in-v" id="totalIn">—</span></span>
+                <span>TX: <span class="out-v" id="totalOut">—</span></span>
+                <span>Session: <strong id="sessionUp">—</strong></span>
+                <span id="resetLabel" style="color:var(--text-dim);font-size:11px" class="ml"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ingest endpoint -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">📥 Ingest Endpoint</span>
+              <button class="btn btn-amber btn-sm" onclick="copyIngest()">⎘ Copy URL</button>
+            </div>
+            <div class="card-body-sm">
+              <div class="ingest-box" onclick="copyIngest()">
+                <div class="ingest-lbl">Encoder → Push to this URL</div>
+                <input id="ingestUrlReal" type="text" readonly tabindex="-1">
+                <div class="ingest-url" id="ingestUrlDisplay">Loading...</div>
+                <span class="ingest-hint">Click to copy</span>
+              </div>
+              <div class="key-row">
+                <span class="key-lbl">Key</span>
+                <div class="key-wrap">
+                  <input class="key-input" id="cfgIngestKey" type="password" readonly placeholder="Loading...">
+                  <button class="key-eye" id="keyEye" onclick="toggleKeyVis()">👁</button>
+                </div>
+                <button class="btn btn-ghost btn-sm btn-icon" onclick="copyIngestKey()" title="Copy key">⎘</button>
+                <button class="btn btn-amber btn-sm" onclick="confirmRegenKey()">⟳ New</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Destinations -->
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">📤 Destinations</span>
+              <button class="btn btn-blue btn-sm" onclick="openModal('addDestModal')">+ Add</button>
+            </div>
+            <div class="card-body-sm">
+              <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+                <button class="btn btn-solid-green" onclick="startAll()">▶ Start All</button>
+                <button class="btn btn-red" onclick="stopAll()">■ Stop All</button>
+                <button class="btn btn-ghost btn-sm" onclick="refreshStatus()" style="margin-left:auto">↻</button>
+              </div>
+              <div id="destList" class="dest-list">
+                <div class="dest-empty">No destinations configured yet.</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tab-main -->
+
+        <!-- Tab panel: History (mobile) -->
+        <div class="tab-panel" id="tab-history">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">📋 Broadcast History</span>
+              <span style="font-size:12px;color:var(--text-3);font-weight:600" id="histCount">0 sessions</span>
+            </div>
+            <div class="card-body-sm">
+              <div id="histList" class="hist-list">
+                <div class="hist-empty">No sessions recorded yet.</div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /tab-history -->
+
+      </div><!-- /left col -->
+
+      <!-- ── RIGHT COLUMN (desktop only) ── -->
+      <div>
+
+        <!-- Settings -->
+        <div class="card">
+          <div class="card-head"><span class="card-title">⚙️ Settings</span></div>
+          <div class="card-body-sm">
+            <div class="setting-row">
+              <div>
+                <div class="setting-lbl">Auto-Restart</div>
+                <div class="setting-desc">Reconnect streams on disconnect</div>
+              </div>
+              <button class="toggle" id="cfgAutoRestart" onclick="toggleAutoRestart()"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Log -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">📟 System Log</span>
+            <button class="btn btn-ghost btn-xs" onclick="clearLogs()">Clear</button>
+          </div>
+          <div style="padding:10px 12px">
+            <div class="log-area" id="logArea"><div class="log-line">Connecting...</div></div>
+          </div>
+        </div>
+
+        <!-- History (desktop) -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">📋 Broadcast History</span>
+            <span style="font-size:12px;color:var(--text-3);font-weight:600" id="histCountD">0 sessions</span>
+          </div>
+          <div class="card-body-sm">
+            <div id="histListD" class="hist-list">
+              <div class="hist-empty">No sessions recorded yet.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right col -->
+    </div><!-- /desktop-grid -->
+  </div><!-- /page -->
+
+  <!-- Mobile bottom nav -->
+  <nav class="mob-nav">
+    <button class="mob-nav-btn active" id="nav-main" onclick="mobTab('main')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Main
+    </button>
+    <button class="mob-nav-btn" id="nav-history" onclick="mobTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+      History
+    </button>
+    <button class="mob-nav-btn" id="nav-settings" onclick="openModal('settingsMobModal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+  </nav>
+
+</div><!-- /appScreen -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add Destination -->
+<div class="modal-overlay" id="addDestModal" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Add Destination</span>
+      <button class="modal-x" onclick="closeModal('addDestModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="preset-grid">
+        <button class="preset-btn yt"  onclick="fillPreset('youtube')">YouTube</button>
+        <button class="preset-btn fb"  onclick="fillPreset('facebook')">Facebook</button>
+        <button class="preset-btn tw"  onclick="fillPreset('twitch')">Twitch</button>
+        <button class="preset-btn tt"  onclick="fillPreset('custom')">Custom</button>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Name</label>
+        <input class="f-input" id="newName" placeholder="e.g. YouTube Live">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Platform</label>
+        <select class="f-select" id="newPlatform">
+          <option value="youtube">YouTube</option>
+          <option value="facebook">Facebook</option>
+          <option value="twitch">Twitch</option>
+          <option value="tiktok">TikTok</option>
+          <option value="custom">Custom RTMP</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label class="f-label">RTMP URL <span style="color:var(--text-3);font-weight:400">(without stream key)</span></label>
+        <input class="f-input" id="newUrl" placeholder="rtmp://a.rtmp.youtube.com/live2">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Stream Key</label>
+        <input class="f-input" id="newKey" type="password" placeholder="xxxx-xxxx-xxxx">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('addDestModal')">Cancel</button>
+      <button class="btn btn-solid-blue" onclick="addDest()">Add Destination</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password -->
+<div class="modal-overlay" id="changePwModal" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Change Password</span>
+      <button class="modal-x" onclick="closeModal('changePwModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-err" id="changePwErr"></div>
+      <div class="f-group">
+        <label class="f-label">Current Password</label>
+        <input class="f-input" id="cpCurrent" type="password" placeholder="Current password">
+      </div>
+      <div class="f-group">
+        <label class="f-label">New Password</label>
+        <input class="f-input" id="cpNew" type="password" placeholder="New password (min 8 chars)">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Confirm New Password</label>
+        <input class="f-input" id="cpConfirm" type="password" placeholder="Confirm">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('changePwModal')">Cancel</button>
+      <button class="btn btn-solid-blue" onclick="doChangePw()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Settings Modal -->
+<div class="modal-overlay" id="settingsMobModal" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Settings</span>
+      <button class="modal-x" onclick="closeModal('settingsMobModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-row">
+        <div>
+          <div class="setting-lbl">Auto-Restart</div>
+          <div class="setting-desc">Reconnect streams on disconnect</div>
+        </div>
+        <button class="toggle" id="cfgAutoRestartMob" onclick="toggleAutoRestartMob()"></button>
+      </div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="log-area" id="logAreaMob"><div class="log-line">—</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="openModal('changePwModal');closeModal('settingsMobModal')">Change Password</button>
+      <button class="btn btn-red" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let authToken   = sessionStorage.getItem('yhb_tok') || '';
+let currentUser = '';
+let currentConfig = {};
+let autoRestartVal = false;
+let _configDirty   = false;
+let keyVisible     = false;
+let _peakIn = 0, _peakOut = 0;
+let _sessionStart  = null;
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+setInterval(() => {
+  const el = document.getElementById('clockEl');
+  if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+}, 1000);
+
+// ── Mobile tab ─────────────────────────────────────────────────────────────
+function mobTab(name) {
+  ['main','history'].forEach(t => {
+    document.getElementById('tab-'+t)?.classList.toggle('active', t===name);
+    document.getElementById('nav-'+t)?.classList.toggle('active', t===name);
+  });
+  document.getElementById('nav-settings')?.classList.remove('active');
+}
+
+// ── API ────────────────────────────────────────────────────────────────────
+async function api(method, path, body, pub) {
+  try {
+    const h = { 'Content-Type': 'application/json' };
+    if (!pub && authToken) h['Authorization'] = `Bearer ${authToken}`;
+    const r = await fetch('/api' + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+    if (r.status === 401 && !pub) { showExpired(); return null; }
+    return await r.json();
+  } catch { return null; }
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, type = 'inf') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+async function initAuth() {
+  const s = await api('GET', '/auth/setup-status', null, true);
+  if (!s) return;
+  if (s.setupRequired) { showSetup(); return; }
+  if (authToken) {
+    const v = await api('GET', '/auth/verify');
+    if (v?.valid) { enterApp(v.username); return; }
+  }
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById('authScreen').classList.add('show');
+  document.getElementById('loginCard').style.display = '';
+  document.getElementById('setupCard').style.display = 'none';
+  document.getElementById('appScreen').classList.remove('show');
+  setTimeout(() => document.getElementById('loginUser').focus(), 100);
+}
+
+function showSetup() {
+  document.getElementById('authScreen').classList.add('show');
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('setupCard').style.display = '';
+  document.getElementById('appScreen').classList.remove('show');
+  setTimeout(() => document.getElementById('setupUser').focus(), 100);
+}
+
+function enterApp(username) {
+  document.getElementById('authScreen').classList.remove('show');
+  document.getElementById('appScreen').classList.add('show');
+  document.getElementById('sessionBar').classList.remove('show');
+  currentUser = username;
+  document.getElementById('userAv').textContent  = username.charAt(0).toUpperCase();
+  document.getElementById('userLbl').textContent = username;
+  refreshStatus();
+  fetchLogs();
+  setInterval(refreshStatus, 3000);
+  setInterval(fetchLogs, 4000);
+}
+
+function showExpired() {
+  authToken = '';
+  sessionStorage.removeItem('yhb_tok');
+  document.getElementById('sessionBar').classList.add('show');
+}
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  err.classList.remove('err');
+  if (!username || !password) { err.textContent = 'Please enter username and password.'; err.classList.add('err'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  const r = await api('POST', '/auth/login', { username, password }, true);
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (!r) { err.textContent = 'Connection error.'; err.classList.add('err'); return; }
+  if (r.success) {
+    authToken = r.token;
+    sessionStorage.setItem('yhb_tok', r.token);
+    document.getElementById('loginPass').value = '';
+    enterApp(r.username);
+  } else {
+    err.textContent = r.error || 'Login failed.';
+    err.classList.add('err');
+    document.getElementById('loginPass').value = '';
+    if (r.remainingAttempts !== undefined && r.remainingAttempts < 5) {
+      document.getElementById('attemptsWrap').style.display = 'block';
+      document.getElementById('attemptsBar').innerHTML =
+        Array.from({length:5},(_,i) => `<div class="att-dot${i>=r.remainingAttempts?' used':''}"></div>`).join('') +
+        `<span>${r.remainingAttempts} attempt${r.remainingAttempts!==1?'s':''} remaining</span>`;
+    }
+  }
+}
+
+async function doSetup() {
+  const u = document.getElementById('setupUser').value.trim();
+  const p = document.getElementById('setupPass').value;
+  const c = document.getElementById('setupPass2').value;
+  const err = document.getElementById('setupErr');
+  const ok  = document.getElementById('setupOk');
+  err.classList.remove('err'); ok.classList.remove('ok');
+  if (!u||!p) { err.textContent='All fields required.'; err.classList.add('err'); return; }
+  if (p!==c)  { err.textContent='Passwords do not match.'; err.classList.add('err'); return; }
+  if (p.length<8) { err.textContent='Password must be at least 8 characters.'; err.classList.add('err'); return; }
+  const btn = document.getElementById('setupBtn');
+  btn.disabled=true; btn.textContent='Creating...';
+  const r = await api('POST','/auth/setup',{username:u,password:p},true);
+  btn.disabled=false; btn.textContent='Create Account';
+  if (r?.success) { ok.textContent='Account created! Redirecting to login...'; ok.classList.add('ok'); setTimeout(showLogin,1500); }
+  else { err.textContent=r?.error||'Setup failed.'; err.classList.add('err'); }
+}
+
+function logout() {
+  authToken=''; sessionStorage.removeItem('yhb_tok');
+  document.getElementById('appScreen').classList.remove('show');
+  showLogin();
+}
+
+async function doChangePw() {
+  const cur = document.getElementById('cpCurrent').value;
+  const nw  = document.getElementById('cpNew').value;
+  const con = document.getElementById('cpConfirm').value;
+  const err = document.getElementById('changePwErr');
+  err.classList.remove('show');
+  if (!cur||!nw) { err.textContent='All fields required.'; err.classList.add('show'); return; }
+  if (nw!==con)  { err.textContent='Passwords do not match.'; err.classList.add('show'); return; }
+  if (nw.length<8) { err.textContent='Minimum 8 characters.'; err.classList.add('show'); return; }
+  const r = await api('POST','/auth/change-password',{currentPassword:cur,newPassword:nw});
+  if (r?.success) { toast('Password updated','ok'); closeModal('changePwModal'); ['cpCurrent','cpNew','cpConfirm'].forEach(id=>document.getElementById(id).value=''); }
+  else { err.textContent=r?.error||'Failed.'; err.classList.add('show'); }
+}
+
+function checkPwStr(pw) {
+  let s=0;
+  if(pw.length>=8)s++; if(pw.length>=12)s++;
+  if(/[A-Z]/.test(pw))s++; if(/[0-9]/.test(pw))s++; if(/[^A-Za-z0-9]/.test(pw))s++;
+  const f=document.getElementById('pwFill');
+  f.style.width=(s/5*100)+'%';
+  f.style.background=['#ef4444','#ef4444','#f59e0b','#f59e0b','#22c55e'][Math.min(s,4)];
+}
+
+// ── Status ─────────────────────────────────────────────────────────────────
+async function refreshStatus() {
+  const data = await api('GET','/status');
+  if (!data) return;
+
+  // Live pill
+  const pill = document.getElementById('livePill');
+  pill.className = 'tb-signal ' + (data.isLive ? 'live' : 'idle');
+  document.getElementById('livePillText').textContent = data.isLive ? 'Live' : 'No Signal';
+
+  // Stats
+  document.getElementById('statSignal').textContent = data.isLive ? '● Live' : '● Idle';
+  document.getElementById('statSignal').style.color = data.isLive ? 'var(--green-lt)' : 'var(--text-3)';
+  document.getElementById('statSignalSub').textContent = data.isLive ? 'Encoder connected' : 'Waiting for encoder';
+  document.getElementById('statActive').textContent  = data.activeCount || 0;
+  document.getElementById('statActiveSub').textContent = `${(data.destinations||[]).length} destination${(data.destinations||[]).length!==1?'s':''}`;
+  document.getElementById('statBwIn').textContent    = formatBw(data.bwIn);
+  document.getElementById('statBwOut').textContent   = formatBw(data.bwOut);
+
+  // Ingest URL — base only (no stream key)
+  const ingestBase = (data.ingestUrl || '').replace(/\/[^\/]+$/, '');
+  currentConfig._ingestBase = ingestBase;
+  currentConfig._ingestUrl  = data.ingestUrl;
+  currentConfig.ingestKey   = data.ingestKey;
+  document.getElementById('ingestUrlReal').value = ingestBase;
+  const m = ingestBase.match(/^(rtmp:\/\/)([^:\/]+)(:\d+)(\/.*)?$/) || [];
+  document.getElementById('ingestUrlDisplay').innerHTML = m.length
+    ? `<span class="host">rtmp://</span><span class="addr">${m[2]}</span><span style="color:var(--amber)">${m[3]}</span><span class="host">${m[4]||''}</span>`
+    : `<span>${esc(ingestBase)}</span>`;
+
+  // Stream key
+  if (!_configDirty) {
+    const ki = document.getElementById('cfgIngestKey');
+    ki.value = data.ingestKey || '';
+    ki.type  = keyVisible ? 'text' : 'password';
+  }
+
+  // Auto-restart config
+  if (!_configDirty) {
+    const cfg = await api('GET','/config');
+    if (cfg) {
+      autoRestartVal = cfg.autoRestart;
+      ['cfgAutoRestart','cfgAutoRestartMob'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'toggle'+(cfg.autoRestart?' on':'');
+      });
+    }
+  }
+
+  // Bitrate
+  updateBitrate(data);
+
+  // Destinations
+  renderDests(data.destinations || []);
+
+  // History — render in both desktop and mobile panels
+  renderHistory(data.streamHistory || []);
+
+  currentConfig._lastData = data;
+}
+
+// ── Bitrate ────────────────────────────────────────────────────────────────
+function updateBitrate(data) {
+  const bwIn  = data.bwIn;
+  const bwOut = data.bwOut;
+  const bwInVal  = bwIn  !== null && bwIn  !== undefined ? bwIn  : 0;
+  const bwOutVal = bwOut !== null && bwOut !== undefined ? bwOut : 0;
+
+  if (data.isLive && !_sessionStart) _sessionStart = Date.now();
+  if (!data.isLive) _sessionStart = null;
+
+  if (bwInVal  > _peakIn)  _peakIn  = bwInVal;
+  if (bwOutVal > _peakOut) _peakOut = bwOutVal;
+
+  const barMax = Math.max(1_000_000, Math.max(_peakIn, _peakOut) * 1.5);
+
+  document.getElementById('bwInVal').textContent  = formatBw(bwIn);
+  document.getElementById('bwOutVal').textContent = formatBw(bwOut);
+  document.getElementById('bwInPeak').textContent  = _peakIn  > 0 ? 'Peak: ' + formatBw(_peakIn)  : 'Peak: —';
+  document.getElementById('bwOutPeak').textContent = _peakOut > 0 ? 'Peak: ' + formatBw(_peakOut) : 'Peak: —';
+  document.getElementById('bwInMax').textContent   = _peakIn  > 0 ? formatBw(barMax) : '—';
+  document.getElementById('bwOutMax').textContent  = _peakOut > 0 ? formatBw(barMax) : '—';
+
+  document.getElementById('bwInBar').style.width  = bwIn  !== null ? Math.min(100, bwInVal  / barMax * 100) + '%' : '0%';
+  document.getElementById('bwOutBar').style.width = bwOut !== null ? Math.min(100, bwOutVal / barMax * 100) + '%' : '0%';
+
+  document.getElementById('totalIn').textContent   = formatBytes(data.bytesIn  || 0);
+  document.getElementById('totalOut').textContent  = formatBytes(data.bytesOut || 0);
+  document.getElementById('sessionUp').textContent = _sessionStart ? formatUptime(Date.now() - _sessionStart) : '—';
+  const rl = document.getElementById('resetLabel');
+  if (data.trafficResetAt) rl.textContent = 'Reset: ' + new Date(data.trafficResetAt).toLocaleTimeString('en-GB', { hour12: false });
+  document.getElementById('bwTs').textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  drawChart(data.bitrateHistory);
+}
+
+function drawChart(history) {
+  const canvas = document.getElementById('bitrateChart');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 800, H = 60;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const inD  = history?.bwIn  || [];
+  const outD = history?.bwOut || [];
+  if (!inD.length) return;
+
+  const allVals = [...inD, ...outD].filter(v => v !== null && v > 0);
+  const maxV = allVals.length ? Math.max(...allVals) : 100_000;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.strokeStyle = 'rgba(30,45,64,.7)'; ctx.lineWidth=1;
+  [1,2,3].forEach(i => {
+    const y = Math.round(H/4*i)+0.5;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  });
+
+  function drawLine(data, c1, c2) {
+    const nonNull = data.filter(v => v !== null);
+    if (nonNull.length < 2) return;
+    const step = W / (data.length - 1);
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, c1+'35'); g.addColorStop(1, c1+'00');
+    ctx.fillStyle = g; ctx.beginPath();
+    let started = false;
+    data.forEach((v,i) => {
+      if (v===null){started=false;return;}
+      const x=i*step, y=H-(v/maxV)*(H-5);
+      if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+    });
+    ctx.lineTo((data.length-1)*step,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    const lg=ctx.createLinearGradient(0,0,W,0);
+    lg.addColorStop(0,c1); lg.addColorStop(1,c2);
+    ctx.strokeStyle=lg; ctx.lineWidth=1.8; ctx.lineJoin='round';
+    ctx.beginPath(); let pen=false;
+    data.forEach((v,i)=>{
+      if(v===null){pen=false;return;}
+      const x=i*step,y=H-(v/maxV)*(H-5);
+      if(!pen){ctx.moveTo(x,y);pen=true;}else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    for(let i=data.length-1;i>=0;i--){
+      if(data[i]!==null){
+        ctx.fillStyle=c2;ctx.beginPath();ctx.arc(i*step,H-(data[i]/maxV)*(H-5),2.5,0,Math.PI*2);ctx.fill();break;
+      }
+    }
+  }
+
+  drawLine(outD,'#1db954','#3dd068');
+  drawLine(inD, '#2d7ef7','#5b9cfa');
+
+  ctx.font='600 10px DM Sans,sans-serif';
+  ctx.fillStyle='rgba(91,156,250,.8)'; ctx.fillText('▼ In',7,13);
+  ctx.fillStyle='rgba(61,208,104,.8)'; ctx.fillText('▲ Out',42,13);
+}
+
+// ── Destinations ───────────────────────────────────────────────────────────
+function renderDests(dests) {
+  const el = document.getElementById('destList');
+  if (!dests.length) {
+    el.innerHTML = '<div class="dest-empty">No destinations configured yet.</div>';
+    return;
+  }
+  el.innerHTML = dests.map(d => {
+    const st = d.streamStatus==='live'?'live':d.streamStatus==='connecting'?'conn':'stopped';
+    const dc = st==='live'?'live':st==='conn'?'conn':'stopped';
+    return `<div class="dest-card ${st}">
+      <div class="dest-top">
+        <div class="dest-name">
+          <div class="dest-dot ${dc}"></div>
+          <span class="dest-name-text">${esc(d.name)}</span>
+          <span class="plat ${d.platform||'custom'}">${d.platform||'custom'}</span>
+        </div>
+        <button class="btn btn-red btn-xs" onclick="delDest('${d.id}','${d.name.replace(/'/g,"\\'")}')">✕</button>
+      </div>
+      <div class="dest-url">${esc(d.url)}/••••${esc(d.key)}</div>
+      ${d.active ? `<div class="dest-stats">
+        <span>Up: <strong>${formatUptime(d.uptime)}</strong></span>
+        <span>Sent: <strong>${formatBytes(d.bytesSent)}</strong></span>
+        ${d.speed?`<span>Speed: <strong>${d.speed}x</strong></span>`:''}
+      </div>`:''}
+      <div class="dest-actions">
+        ${!d.active
+          ? `<button class="btn btn-green btn-sm" onclick="startStream('${d.id}')">▶ Start</button>`
+          : `<button class="btn btn-red btn-sm" onclick="stopStream('${d.id}')">■ Stop</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── History ────────────────────────────────────────────────────────────────
+function renderHistory(history) {
+  const count = history.length + ' session' + (history.length!==1?'s':'');
+  ['histCount','histCountD'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = count;
+  });
+  const html = !history.length
+    ? '<div class="hist-empty">No sessions recorded yet.</div>'
+    : history.map(s => {
+        const dests = (s.destinations||[]).map(d=>d.name).join(', ') || 'None';
+        return `<div class="hist-card">
+          <div class="hist-top">
+            <span class="hist-time">${new Date(s.startedAt).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:false})}</span>
+            <span class="hist-dur">${formatUptime(s.duration||0)}</span>
+          </div>
+          <div class="hist-dests">→ ${esc(dests)}</div>
+          <div class="hist-bw">
+            <span class="hist-rx">↓ ${formatBytes(s.totalBytesIn||0)}</span>
+            <span class="hist-tx">↑ ${formatBytes(s.totalBytesOut||0)}</span>
+          </div>
+        </div>`;
+      }).join('');
+  ['histList','histListD'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  });
+}
+
+// ── Stream controls ────────────────────────────────────────────────────────
+async function startStream(id) {
+  toast('Starting stream...','inf');
+  const r = await api('POST',`/stream/${id}/start`);
+  r?.success ? toast('Stream started','ok') : toast(r?.message||'Failed','err');
+  setTimeout(refreshStatus,1500);
+}
+async function stopStream(id) {
+  const r = await api('POST',`/stream/${id}/stop`);
+  r?.success ? toast('Stream stopped','inf') : toast(r?.message||'Failed','err');
+  setTimeout(refreshStatus,500);
+}
+async function startAll() {
+  toast('Starting all streams...','inf');
+  await api('POST','/stream/start-all');
+  setTimeout(refreshStatus,2000);
+}
+async function stopAll() {
+  await api('POST','/stream/stop-all');
+  toast('All streams stopped','inf');
+  setTimeout(refreshStatus,500);
+}
+
+// ── Destinations CRUD ──────────────────────────────────────────────────────
+const PRESETS = {
+  youtube:  { name:'YouTube Live',  url:'rtmp://a.rtmp.youtube.com/live2',          platform:'youtube' },
+  facebook: { name:'Facebook Live', url:'rtmps://live-api-s.facebook.com:443/rtmp', platform:'facebook' },
+  twitch:   { name:'Twitch',        url:'rtmp://live.twitch.tv/app',                platform:'twitch' },
+  custom:   { name:'Custom',        url:'rtmp://',                                  platform:'custom' },
+};
+
+function fillPreset(t) {
+  const p = PRESETS[t];
+  document.getElementById('newName').value     = p.name;
+  document.getElementById('newUrl').value      = p.url;
+  document.getElementById('newPlatform').value = p.platform;
+}
+
+async function addDest() {
+  const name = document.getElementById('newName').value.trim();
+  const url  = document.getElementById('newUrl').value.trim();
+  const key  = document.getElementById('newKey').value.trim();
+  const plat = document.getElementById('newPlatform').value;
+  if (!name||!url||!key) { toast('Please fill all fields','err'); return; }
+  const r = await api('POST','/destinations',{name,url,key,platform:plat});
+  if (r?.success) {
+    toast('Destination added','ok');
+    closeModal('addDestModal');
+    ['newName','newUrl','newKey'].forEach(id=>document.getElementById(id).value='');
+    refreshStatus();
+  } else toast('Failed to add','err');
+}
+
+async function delDest(id, name) {
+  if (!confirm(`Remove "${name}"?`)) return;
+  await api('DELETE',`/destinations/${id}`);
+  toast('Removed: '+name,'inf');
+  refreshStatus();
+}
+
+// ── Settings ───────────────────────────────────────────────────────────────
+async function toggleAutoRestart() {
+  autoRestartVal = !autoRestartVal;
+  ['cfgAutoRestart','cfgAutoRestartMob'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'toggle'+(autoRestartVal?' on':'');
+  });
+  _configDirty = true;
+  const r = await api('POST','/config',{autoRestart:autoRestartVal});
+  if (r?.success) toast('Auto-Restart '+(autoRestartVal?'enabled':'disabled'),'ok');
+  else {
+    autoRestartVal=!autoRestartVal;
+    ['cfgAutoRestart','cfgAutoRestartMob'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.className = 'toggle'+(autoRestartVal?' on':'');
+    });
+    toast('Failed','err');
+  }
+  _configDirty = false;
+}
+
+function toggleAutoRestartMob() { toggleAutoRestart(); }
+
+// ── Key management ─────────────────────────────────────────────────────────
+function toggleKeyVis() {
+  keyVisible = !keyVisible;
+  document.getElementById('cfgIngestKey').type = keyVisible?'text':'password';
+  document.getElementById('keyEye').textContent = keyVisible?'🙈':'👁';
+}
+
+async function confirmRegenKey() {
+  if (!confirm('Generate a new random stream key?\n\nYou will need to update your encoder settings.')) return;
+  const r = await api('POST','/config/regenerate-key');
+  if (r?.success) {
+    document.getElementById('cfgIngestKey').value = r.ingestKey;
+    currentConfig.ingestKey = r.ingestKey;
+    toast('New stream key generated — update your encoder!','ok');
+    refreshStatus();
+  } else toast('Failed','err');
+}
+
+function copyIngestKey() {
+  const key = document.getElementById('cfgIngestKey').value;
+  if (!key) return;
+  forceCopy(key).then(()=>toast('Stream key copied','ok'));
+}
+
+// ── Copy ───────────────────────────────────────────────────────────────────
+function forceCopy(text) {
+  if (navigator.clipboard && window.isSecureContext)
+    return navigator.clipboard.writeText(text).then(()=>true).catch(()=>legacyCopy(text));
+  return Promise.resolve(legacyCopy(text));
+}
+function legacyCopy(text) {
+  const el = document.createElement('input');
+  el.value=text; el.style.cssText='position:fixed;top:0;left:0;opacity:0;width:2px;height:2px';
+  document.body.appendChild(el); el.focus(); el.select(); el.setSelectionRange(0,text.length);
+  let ok=false; try{ok=document.execCommand('copy');}catch{}
+  document.body.removeChild(el); return ok;
+}
+function copyIngest() {
+  const url = currentConfig._ingestBase || currentConfig._ingestUrl;
+  if (!url) { toast('URL not ready yet','err'); return; }
+  forceCopy(url).then(()=>toast('Ingest URL copied!','ok'));
+}
+
+// ── Traffic reset ──────────────────────────────────────────────────────────
+async function resetTraffic() {
+  const r = await api('POST','/stats/reset-traffic');
+  if (r?.success) {
+    _peakIn=0; _peakOut=0;
+    ['bwInPeak','bwOutPeak'].forEach(id=>document.getElementById(id).textContent='Peak: —');
+    ['totalIn','totalOut'].forEach(id=>document.getElementById(id).textContent='0 B');
+    toast('Traffic counters reset','ok');
+  } else toast('Failed','err');
+}
+
+// ── Logs ───────────────────────────────────────────────────────────────────
+async function fetchLogs() {
+  const r = await api('GET','/logs?limit=80');
+  if (!r?.logs) return;
+  const logHtml = r.logs.map(line => {
+    let cls='';
+    if(line.includes('[START]'))  cls='start';
+    else if(line.includes('[STOP]'))   cls='stop';
+    else if(line.includes('[ERROR]'))  cls='error';
+    else if(line.includes('[AUTH]'))   cls='auth';
+    else if(line.includes('[INGEST]')) cls='ingest';
+    else if(line.includes('[AUTO]'))   cls='auto';
+    else if(line.includes('[WARN]'))   cls='warn';
+    return `<div class="log-line ${cls}">${esc(line)}</div>`;
+  }).join('');
+
+  ['logArea','logAreaMob'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const atBot = el.scrollHeight-el.scrollTop <= el.clientHeight+40;
+    el.innerHTML = logHtml;
+    if (atBot) el.scrollTop = el.scrollHeight;
+  });
+}
+function clearLogs() {
+  ['logArea','logAreaMob'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML='<div class="log-line">Log cleared.</div>';
+  });
+}
+
+// ── Modals ─────────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function bgClose(e) { if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); }
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function formatBw(bps) {
+  if (bps === null || bps === undefined) return '—';
+  if (bps === 0) return '0 kbps';
+  if (bps < 1000) return bps + ' bps';
+  if (bps < 1_000_000) return (bps / 1000).toFixed(0) + ' kbps';
+  return (bps / 1_000_000).toFixed(2) + ' Mbps';
+}
+function formatBytes(b) {
+  if (!b) return '0 B';
+  if (b<1024) return b+' B';
+  if (b<1048576) return (b/1024).toFixed(1)+' KB';
+  if (b<1073741824) return (b/1048576).toFixed(1)+' MB';
+  return (b/1073741824).toFixed(2)+' GB';
+}
+function formatUptime(ms) {
+  if (!ms) return '0s';
+  const s=Math.floor(ms/1000);
+  if(s<60) return s+'s';
+  const m=Math.floor(s/60);
+  if(m<60) return m+'m '+s%60+'s';
+  return Math.floor(m/60)+'h '+m%60+'m';
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Keyboard
+document.getElementById('loginPass').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('loginUser').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();});
+
+window.addEventListener('resize',()=>{
+  if (currentConfig._lastData) drawChart(currentConfig._lastData.bitrateHistory);
+});
+
+initAuth();
+</script>
+</body>
+</html>
